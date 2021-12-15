@@ -16,6 +16,7 @@
     "main_module": "netskope_connector.pyc",
     "min_phantom_version": "4.6.19142",
     "app_wizard_version": "1.0.0",
+    "fips_compliant": true,
     "configuration": {
         "server_url": {
             "description": "Server URL",

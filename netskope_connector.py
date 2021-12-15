@@ -1688,7 +1688,7 @@ class NetskopeConnector(BaseConnector):
                 self.debug_print('Handled exception in _create_dict_hash', e)
                 return
 
-            return hashlib.md5(input_dict_str).hexdigest()
+            return hashlib.sha256(input_dict_str).hexdigest()
 
     def _handle_update_url_list(self, param):
         """ This function is used to list files.

@@ -2128,7 +2128,7 @@ if __name__ == '__main__':
         login_url = BaseConnector._get_phantom_base_url() + 'login'
         try:
             print('Accessing the Login page')
-            response = requests.get(login_url, verify=False)
+            response = requests.get(login_url, verify=False)  # nosemgrep
             csrftoken = response.cookies['csrftoken']
             data = dict()
             data['username'] = username
@@ -2138,7 +2138,7 @@ if __name__ == '__main__':
             headers['Cookie'] = ('csrftoken={}').format(csrftoken)
             headers['Referer'] = login_url
             print('Logging into Platform to get the session id')
-            response2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            response2 = requests.post(login_url, verify=False, data=data, headers=headers)  # nosemgrep
             session_id = response2.cookies['sessionid']
         except Exception as e:
             print('Unable to get session id from the platform. Error: {}'.format(str(e)))

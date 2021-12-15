@@ -14,7 +14,7 @@
 # and limitations under the License.
 NETSKOPE_CONFIG_SERVER_URL = 'server_url'
 NETSKOPE_CONFIG_SCIM_URL = 'scim_url'
-NETSKOPE_CONFIG_API_KEY = 'api_key'
+NETSKOPE_CONFIG_API_KEY = 'api_key'  # pragma: allowlist secret
 NETSKOPE_CONFIG_SCIM_KEY = 'scim_key'
 NETSKOPE_CONNECTIVITY_ENDPOINT = '/api/v1/clients'
 NETSKOPE_QUARANTINE_ENDPOINT = '/api/v1/quarantine'

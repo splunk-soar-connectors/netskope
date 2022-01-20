@@ -317,6 +317,22 @@ class NetskopeConnector(BaseConnector):
 
         return self._process_response(requests_response, action_result)
 
+    def _get_fips_enabled(self):
+
+        try:
+            from phantom_common.install_info import is_fips_enabled
+        except ImportError:
+            return False
+
+        fips_enabled = is_fips_enabled()
+
+        if fips_enabled:
+            self.debug_print('FIPS is enabled')
+        else:
+            self.debug_print('FIPS is not enabled')
+
+        return fips_enabled
+
     def _handle_test_connectivity(self, param):
         """ This function is used to handle the test connectivity.
 
@@ -1710,7 +1726,10 @@ class NetskopeConnector(BaseConnector):
                 self.debug_print('Handled exception in _create_dict_hash', e)
                 return
 
+        if self._get_fips_enabled():
             return hashlib.sha256(input_dict_str).hexdigest()
+        else:
+            return hashlib.md5(input_dict_str).hexdigest()
 
     def _handle_update_url_list(self, param):
         """ This function is used to list files.

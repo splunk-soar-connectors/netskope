@@ -1739,16 +1739,19 @@ class NetskopeConnector(BaseConnector):
         """
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        ret_val = self._update_url_helper(action_result)
+        ret_val = self._update_url_helper(action_result, "update_url")
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _update_url_helper(self, action_result):
+    def _update_url_helper(self, action_result, action_name=None):
         """ Helper function for updating URL."""
         try:
+            config = self.get_config()
             exists, message, content = self.get_url_list()
             params = {'list': (',').join(content), 'name': self._list_name}
+            if(action_name == "update_url"):
+                params.update({'name': self._unicode_string_handler(config[NETSKOPE_LIST_NAME])})
             self._log.info(('action=get_url_list exists={} message={} content_length={}').format(exists, message, len(content)))
             request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_URL_LIST_ENDPOINT,
                     action_result=action_result, params=params)

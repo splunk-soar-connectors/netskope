@@ -14,10 +14,10 @@
     "utctime_updated": "2022-01-21T22:23:47.000000Z",
     "package_name": "phantom_netskope",
     "main_module": "netskope_connector.py",
-    "min_phantom_version": "5.0.0",
+    "min_phantom_version": "5.1.0",
     "app_wizard_version": "1.0.0",
     "python_version": "2.7",
-    "fips_compliant": true,
+    "fips_compliant": false,
     "configuration": {
         "server_url": {
             "description": "Server URL",

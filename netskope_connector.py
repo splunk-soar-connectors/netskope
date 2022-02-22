@@ -68,7 +68,7 @@ class NetskopeConnector(BaseConnector):
         try:
             if input_str:
                 return UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
+        except Exception:
             self.debug_print("Error ocurred while converting the string")
         return input_str
 
@@ -97,11 +97,14 @@ class NetskopeConnector(BaseConnector):
         status_code = response.status_code
         try:
             soup = BeautifulSoup(response.text, 'html.parser')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
             error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [ x.strip() for x in split_lines if x.strip() ]
             error_text = ('\n').join(split_lines)
-        except:
+        except Exception:
             error_text = 'Cannot parse error details'
 
         message = ('Status Code: {0}. Data from server:\n{1}\n').format(status_code,
@@ -192,13 +195,18 @@ class NetskopeConnector(BaseConnector):
                 params = {}
             config = self.get_config()
             self._log.info(('config={} params={} timeout={}').format(config, params, timeout))
-            try:
-                self._scim['url'] = self._unicode_string_handler(config.get(NETSKOPE_CONFIG_SCIM_URL)).strip('/')
-                self._scim['token'] = config[NETSKOPE_CONFIG_SCIM_KEY]
-            except Exception as e:
-                self.debug_print('Error while encoding server URL')
+            if config.get(NETSKOPE_CONFIG_SCIM_URL) and config.get(NETSKOPE_CONFIG_SCIM_KEY):
+                try:
+                    self._scim['url'] = self._unicode_string_handler(config.get(NETSKOPE_CONFIG_SCIM_URL)).strip('/')
+                    self._scim['token'] = config.get(NETSKOPE_CONFIG_SCIM_KEY)
+                except Exception as e:
+                    self.debug_print('Error while encoding server URL')
+                    return RetVal(action_result.set_status(phantom.APP_ERROR,
+                            'Error while encoding server URL: {}'.format(e)), resp_json)
+            else:
+                self.debug_print("Please configure 'SCIM Server URL' in asset settings.")
                 return RetVal(action_result.set_status(phantom.APP_ERROR,
-                        'Error while encoding server URL: {}'.format(e)), resp_json)
+                        "Please configure both 'SCIM Server URL' and 'SCIM Token' in asset settings to execute this action"))
 
             try:
                 request_func = getattr(requests, method)
@@ -267,7 +275,7 @@ class NetskopeConnector(BaseConnector):
             self._api_key = config[NETSKOPE_CONFIG_API_KEY]
             self._list_name = self._unicode_string_handler(config[NETSKOPE_LIST_NAME])
             self._log.info(('tenant={}').format(self._tenant))
-        except:
+        except Exception:
             self.debug_print('Error while initializing server URL and basic connection parameters from the asset configuration')
             return RetVal(action_result.set_status(phantom.APP_ERROR,
                     'Error while initializing server URL and basic connection parameters from the asset configuration'),
@@ -295,8 +303,8 @@ class NetskopeConnector(BaseConnector):
                         return RetVal(phantom.APP_SUCCESS, resp_json)
             else:
                 requests_response = request_func(url, params=params, timeout=timeout)
-        except requests.exceptions.ConnectionError:
-            message = 'Error Details: Connection Refused from the Server'
+        except requests.exceptions.ConnectionError as e:
+            message = 'Error Details: Connection Refused from the Server. {}'.format(str(e))
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         except Exception as e:
             if os.path.exists(temp_file_path):
@@ -305,7 +313,7 @@ class NetskopeConnector(BaseConnector):
                 try:
                     error_msg = self._unicode_string_handler(e)
                     message = ('Error connecting to server. Details: {0}').format(error_msg)
-                except:
+                except Exception:
                     return RetVal(action_result.set_status(phantom.APP_ERROR,
                             'Error connecting to server. Please check for valid server URL'), resp_json)
 
@@ -475,14 +483,14 @@ class NetskopeConnector(BaseConnector):
         """
         try:
             start_time = int(float(start_time))
-        except:
+        except Exception:
             self.debug_print(NETSKOPE_INVALID_START_TIME)
             return (
              phantom.APP_ERROR, NETSKOPE_INVALID_START_TIME)
 
         try:
             end_time = int(float(end_time))
-        except:
+        except Exception:
             self.debug_print(NETSKOPE_INVALID_END_TIME)
             return (
              phantom.APP_ERROR, NETSKOPE_INVALID_END_TIME)
@@ -2101,6 +2109,10 @@ class NetskopeConnector(BaseConnector):
         self._log.info('action=initialize status=start')
         self._state = self.load_state()
         self._log.info(('action=initialize state={}').format(self._state))
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {"app_version": self.get_app_json().get("app_version")}
+            return self.set_status(phantom.APP_ERROR, NETSKOPE_STATE_FILE_CORRUPT_ERR)
         config = self.get_config()
         self._file_list = ('{}_{}').format(self._unicode_string_handler(config.get(NETSKOPE_LIST_NAME, '')), NETSKOPE_FILE_LIST)
         self._url_list = ('{}_{}').format(self._unicode_string_handler(config.get(NETSKOPE_LIST_NAME, '')), NETSKOPE_URL_LIST)
@@ -2116,6 +2128,7 @@ class NetskopeConnector(BaseConnector):
                 len(list_contents)))
         if not list_status:
             self._log.info(('action=create_file_list return={}').format(self.create_file_list()))
+
         return phantom.APP_SUCCESS
 
     def finalize(self):
@@ -2139,10 +2152,12 @@ if __name__ == '__main__':
     argparser.add_argument('input_test_json', help='Input Test JSON file')
     argparser.add_argument('-u', '--username', help='username', required=False)
     argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
     args = argparser.parse_args()
     session_id = None
     username = args.username
     password = args.password
+    verify = args.verify
     if username is not None and password is None:
         import getpass
         password = getpass.getpass('Password: ')
@@ -2150,7 +2165,7 @@ if __name__ == '__main__':
         login_url = BaseConnector._get_phantom_base_url() + 'login'
         try:
             print('Accessing the Login page')
-            response = requests.get(login_url, verify=False)  # nosemgrep
+            response = requests.get(login_url, verify=verify, timeout=NETSKOPE_DEFAULT_TIMEOUT)
             csrftoken = response.cookies['csrftoken']
             data = dict()
             data['username'] = username
@@ -2160,7 +2175,7 @@ if __name__ == '__main__':
             headers['Cookie'] = ('csrftoken={}').format(csrftoken)
             headers['Referer'] = login_url
             print('Logging into Platform to get the session id')
-            response2 = requests.post(login_url, verify=False, data=data, headers=headers)  # nosemgrep
+            response2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=NETSKOPE_DEFAULT_TIMEOUT)
             session_id = response2.cookies['sessionid']
         except Exception as e:
             print('Unable to get session id from the platform. Error: {}'.format(str(e)))

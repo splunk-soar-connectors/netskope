@@ -49,3 +49,9 @@ NETSKOPE_DEFAULT_LIMIT = 50
 NETSKOPE_URL_LIST = 'netskope_url_list'
 NETSKOPE_FILE_LIST = 'netskope_file_list'
 NETSKOPE_LIST_NAME = 'list_name'
+NETSKOPE_STATE_FILE_CORRUPT_ERR = (
+    "Error occurred while loading the state file due to its unexpected format. "
+    "Resetting the state file with the default format. Please try again."
+)
+# Timeout
+NETSKOPE_DEFAULT_TIMEOUT = 30

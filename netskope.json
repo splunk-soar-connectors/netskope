@@ -91,14 +91,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.file",
                     "data_type": "string",
                     "example_values": [
@@ -149,13 +141,11 @@
                     "column_name": "Vault ID"
                 },
                 {
-                    "data_path": "action_result.summary.vault_id",
+                    "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "d211433b0b9dba7e429618df77f1d9c6573627ed"
-                    ],
-                    "contains": [
-                        "vault id"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -163,6 +153,16 @@
                     "data_type": "string",
                     "example_values": [
                         "Vault id: d211433b0b9dba7e429618df77f1d9c6573627ed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.vault_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "d211433b0b9dba7e429618df77f1d9c6573627ed"
+                    ],
+                    "contains": [
+                        "vault id"
                     ]
                 },
                 {
@@ -206,22 +206,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.user",
                     "data_type": "string",
                     "contains": [
@@ -229,6 +213,30 @@
                         "email",
                         "user name"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "column_name": "Active",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope external id"
+                    ],
+                    "column_name": "External ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope scim user id"
+                    ],
+                    "column_name": "SCIM ID",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.userName",
@@ -242,28 +250,20 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.data.*.active",
-                    "data_type": "boolean",
-                    "column_name": "Active",
-                    "column_order": 1
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "string",
-                    "contains": [
-                        "netskope scim user id"
-                    ],
-                    "column_name": "SCIM ID",
-                    "column_order": 2
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.externalId",
-                    "data_type": "string",
-                    "contains": [
-                        "netskope external id"
-                    ],
-                    "column_name": "External ID",
-                    "column_order": 3
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -304,22 +304,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.group",
                     "data_type": "string",
                     "contains": [
@@ -336,6 +320,15 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data.*.externalId",
+                    "data_type": "string",
+                    "contains": [
+                        "netskope external id"
+                    ],
+                    "column_name": "External ID",
+                    "column_order": 2
+                },
+                {
                     "data_path": "action_result.data.*.id",
                     "data_type": "string",
                     "contains": [
@@ -345,13 +338,20 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.data.*.externalId",
+                    "data_path": "action_result.status",
                     "data_type": "string",
-                    "contains": [
-                        "netskope external id"
-                    ],
-                    "column_name": "External ID",
-                    "column_order": 2
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -393,22 +393,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.parameter.group",
                     "data_type": "string",
                     "contains": [
@@ -429,6 +413,22 @@
                     "contains": [
                         "netskope scim group id"
                     ]
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -491,26 +491,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.user",
+                    "data_path": "action_result.parameter.email",
                     "data_type": "string",
                     "contains": [
-                        "netskope user"
+                        "netskope user",
+                        "email"
                     ]
                 },
                 {
@@ -522,18 +507,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.email",
+                    "data_path": "action_result.parameter.user",
                     "data_type": "string",
                     "contains": [
-                        "netskope user",
-                        "email"
+                        "netskope user"
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.userName",
-                    "data_type": "string",
-                    "column_name": "Username",
-                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -543,6 +521,28 @@
                     "contains": [
                         "netskope scim user id"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.userName",
+                    "data_type": "string",
+                    "column_name": "Username",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -596,29 +596,17 @@
                     "data_type": "string",
                     "required": true,
                     "default": "add",
-                    "example_values": [
-                        "add",
-                        "delete"
-                    ],
                     "order": 2
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.parameter.action",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "add",
+                        "delete"
                     ]
-                },
-                {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.group",
@@ -626,10 +614,6 @@
                     "contains": [
                         "netskope scim group id"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.action",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.user",
@@ -646,6 +630,22 @@
                     ],
                     "column_name": "Group Name",
                     "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.*",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -675,14 +675,6 @@
             "read_only": true,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.data.*.file_id",
                     "data_type": "string",
@@ -765,10 +757,11 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.summary.total_files",
-                    "data_type": "numeric",
+                    "data_path": "action_result.status",
+                    "data_type": "string",
                     "example_values": [
-                        12
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -776,6 +769,13 @@
                     "data_type": "string",
                     "example_values": [
                         "Total files: 12"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
                     ]
                 },
                 {
@@ -828,14 +828,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.end_time",
                     "data_type": "numeric",
@@ -953,31 +945,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.application.*.dst_country",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.application.*.dst_location",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.application.*.dst_region",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.application.*.dst_zipcode",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.application.*.dstip",
@@ -1039,10 +1019,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.application.*.organization_unit",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.application.*.os",
@@ -1295,31 +1272,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.page.*.dst_country",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.page.*.dst_location",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.page.*.dst_region",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.page.*.dst_zipcode",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.page.*.dstip",
@@ -1378,10 +1343,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.page.*.organization_unit",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.page.*.os",
@@ -1574,6 +1536,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total page events: 7, Total application events: 61"
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.total_application_events",
                     "data_type": "numeric",
                     "example_values": [
@@ -1585,13 +1562,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         7
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total page events: 7, Total application events: 61"
                     ]
                 },
                 {
@@ -1684,6 +1654,10 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -1695,10 +1669,6 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -1729,7 +1699,7 @@
             "action": "remove url",
             "identifier": "remove_url_list",
             "description": "Remove an URL from the Netskope URL Blocklist",
-            "type": "contain",
+            "type": "correct",
             "undo": "add url",
             "read_only": false,
             "parameters": {
@@ -1757,6 +1727,10 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -1768,10 +1742,6 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -1807,6 +1777,10 @@
             "parameters": {},
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -1818,10 +1792,6 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -1880,6 +1850,10 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -1891,10 +1865,6 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -1925,7 +1895,7 @@
             "action": "remove hash",
             "identifier": "remove_file_list",
             "description": "Remove a hash from the Netskope file hash list",
-            "type": "contain",
+            "type": "correct",
             "undo": "add hash",
             "read_only": false,
             "parameters": {
@@ -1953,6 +1923,10 @@
                     "column_order": 0
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -1964,10 +1938,6 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -2003,6 +1973,10 @@
             "parameters": {},
             "output": [
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "column_name": "Status",
@@ -2014,10 +1988,6 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {

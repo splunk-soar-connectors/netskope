@@ -1,11 +1,20 @@
 # File: netskope_consts.py
-# Copyright (c) 2018-2020 Splunk Inc.
 #
-# Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)
-
+# Copyright (c) 2018-2022 Splunk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+# either express or implied. See the License for the specific language governing permissions
+# and limitations under the License.
 NETSKOPE_CONFIG_SERVER_URL = 'server_url'
 NETSKOPE_CONFIG_SCIM_URL = 'scim_url'
-NETSKOPE_CONFIG_API_KEY = 'api_key'
+NETSKOPE_CONFIG_API_KEY = 'api_key'  # pragma: allowlist secret
 NETSKOPE_CONFIG_SCIM_KEY = 'scim_key'
 NETSKOPE_CONNECTIVITY_ENDPOINT = '/api/v1/clients'
 NETSKOPE_QUARANTINE_ENDPOINT = '/api/v1/quarantine'

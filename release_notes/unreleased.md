@@ -1,1 +1,2 @@
 **Unreleased**
+* Updating wheel dependencies

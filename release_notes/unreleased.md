@@ -1,2 +1,2 @@
 **Unreleased**
-* Removed unwanted code from the app files
+* Updated the app documentation

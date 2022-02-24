@@ -226,6 +226,9 @@ class NetskopeConnector(BaseConnector):
                     requests_response = request_func(url, headers=headers, params=params, timeout=timeout)
                 else:
                     requests_response = request_func(url, headers=headers, data=json.dumps(params), timeout=timeout)
+            except requests.exceptions.InvalidURL:
+                err = 'Error connecting to server. Invalid URL %s' % (url)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
             except Exception as e:
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
@@ -306,6 +309,9 @@ class NetskopeConnector(BaseConnector):
         except requests.exceptions.ConnectionError as e:
             message = 'Error Details: Connection Refused from the Server. {}'.format(str(e))
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
+        except requests.exceptions.InvalidURL:
+            err = 'Error connecting to server. Invalid URL %s' % (url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
         except Exception as e:
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)

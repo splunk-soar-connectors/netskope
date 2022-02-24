@@ -1,2 +1,2 @@
 **Unreleased**
-* Bug fix in update_url action
+* Bug fixed in update_url action

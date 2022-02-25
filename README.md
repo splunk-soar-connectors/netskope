@@ -2,16 +2,16 @@
 # Netskope
 
 Publisher: Netskope  
-Connector Version: 2\.0\.1  
+Connector Version: 2\.1\.1  
 Product Vendor: Netskope  
 Product Name: Netskope  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.6\.19142  
+Minimum Product Version: 5\.0\.0  
 
 This app integrates with the Netskope to execute various investigative and polling actions
 
-[comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2018-2020 Splunk Inc."
+[comment]: # " File: README.md"
+[comment]: # "  Copyright (c) 2018-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
 [comment]: # ""
@@ -552,7 +552,7 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**hash** |  required  | hash to remove | string |  `hash`  `md5` 
+**hash** |  required  | Hash to remove | string |  `hash`  `md5` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS

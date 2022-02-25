@@ -26,7 +26,7 @@ import requests
 from bs4 import BeautifulSoup, UnicodeDammit
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
-from phantom.vault import Vault
+from phantom import vault
 from urlparse import urlparse
 
 from netskope_consts import *
@@ -204,9 +204,9 @@ class NetskopeConnector(BaseConnector):
                     return RetVal(action_result.set_status(phantom.APP_ERROR,
                             'Error while encoding server URL: {}'.format(e)), resp_json)
             else:
-                self.debug_print("Please configure 'SCIM Server URL' in asset settings.")
+                self.debug_print("Please configure both 'SCIM Server URL' and 'SCIM Token' in asset settings to execute this action")
                 return RetVal(action_result.set_status(phantom.APP_ERROR,
-                        "Please configure both 'SCIM Server URL' and 'SCIM Token' in asset settings to execute this action"))
+                        "Please configure both 'SCIM Server URL' and 'SCIM Token' in asset settings to execute this action"), resp_json)
 
             try:
                 request_func = getattr(requests, method)
@@ -374,15 +374,23 @@ class NetskopeConnector(BaseConnector):
         generate_file_hash_status, file_hash = self._generate_file_hash(file_path=temp_file_path)
         if phantom.is_fail(generate_file_hash_status):
             return action_result.set_status(phantom.APP_ERROR, status_message='Downloaded file does not exist')
-        vault_file_list = Vault.get_file_info(vault_id=file_hash, container_id=self.get_container_id())
-        for vault_file_item in vault_file_list:
-            if vault_file_item['vault_id'] == file_hash and vault_file_item['name'] == file_name:
-                vault_id = vault_file_item['vault_id']
-                break
-        else:
-            vault_add_file_dict = Vault.add_attachment(file_location=temp_file_path,
-                    container_id=self.get_container_id(), file_name=file_name)
-            vault_id = vault_add_file_dict['vault_id']
+        try:
+            success, message, vault_file_list = vault.vault_info(vault_id=file_hash, container_id=self.get_container_id())
+            vault_file_list = list(vault_file_list)
+            if not success:
+                return action_result.set_status(phantom.APP_ERROR, message)
+            for vault_file_item in vault_file_list:
+                if vault_file_item['vault_id'] == file_hash and vault_file_item['name'] == file_name:
+                    vault_id = vault_file_item['vault_id']
+                    break
+            else:
+                success, message, vault_add_file_dict = vault.vault_add(container=self.get_container_id(), 
+                    file_location=temp_file_path, file_name=file_name)
+                if not success:
+                    return action_result.set_status(phantom.APP_ERROR, message)
+                vault_id = vault_add_file_dict['vault_id']
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while fetching the vault details")
 
         action_result.add_data({'vault_id': vault_id,
            'file_name': file_name})

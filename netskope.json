@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Netskope",
     "license": "Copyright 2018-2022 Netskope, Inc.",
-    "app_version": "2.1.2",
+    "app_version": "2.2.0",
     "utctime_updated": "2022-01-21T22:23:47.000000Z",
     "package_name": "phantom_netskope",
     "main_module": "netskope_connector.py",
@@ -262,8 +262,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -350,8 +353,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -427,8 +433,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_groups",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -541,8 +550,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -644,8 +656,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.*",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1672,8 +1687,22 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.set_list",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_urls",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1745,8 +1774,22 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.remove_msg",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_urls",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1795,8 +1838,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1868,8 +1914,22 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
+                    "data_path": "action_result.summary.set_list",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_hashes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1941,8 +2001,18 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.remove_msg",
+                    "data_type": "string",
+                    "example_values": [
+                        "Deleted Single Row"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1991,8 +2061,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary",
-                    "data_type": "string"
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",

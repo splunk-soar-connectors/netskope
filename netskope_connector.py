@@ -24,9 +24,9 @@ import phantom.app as phantom
 import phantom.rules as phantom_rules
 import requests
 from bs4 import BeautifulSoup, UnicodeDammit
+from phantom import vault
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
-from phantom import vault
 from urlparse import urlparse
 
 from netskope_consts import *
@@ -384,7 +384,7 @@ class NetskopeConnector(BaseConnector):
                     vault_id = vault_file_item['vault_id']
                     break
             else:
-                success, message, vault_add_file_dict = vault.vault_add(container=self.get_container_id(), 
+                success, message, vault_add_file_dict = vault.vault_add(container=self.get_container_id(),
                     file_location=temp_file_path, file_name=file_name)
                 if not success:
                     return action_result.set_status(phantom.APP_ERROR, message)

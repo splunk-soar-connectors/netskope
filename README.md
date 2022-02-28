@@ -2,19 +2,38 @@
 # Netskope
 
 Publisher: Netskope  
-Connector Version: 2\.1\.1  
+Connector Version: 2\.2\.0  
 Product Vendor: Netskope  
 Product Name: Netskope  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.1\.0  
 
 This app integrates with the Netskope to execute various investigative and polling actions
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2018-2022 Splunk Inc."
+[comment]: # "  Copyright 2018-2022 Netskope, Inc."
 [comment]: # ""
-[comment]: # "  Licensed under Apache 2.0 (https://www.apache.org/licenses/LICENSE-2.0.txt)"
+[comment]: # "  Licensed under the Apache License, Version 2.0 (the 'License');"
+[comment]: # "  you may not use this file except in compliance with the License."
+[comment]: # "  You may obtain a copy of the License at"
 [comment]: # ""
+[comment]: # "    http://www.apache.org/licenses/LICENSE-2.0"
+[comment]: # ""
+[comment]: # "  Unless required by applicable law or agreed to in writing, software distributed under"
+[comment]: # "  the License is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,"
+[comment]: # "  either express or implied. See the License for the specific language governing permissions"
+[comment]: # "  and limitations under the License."
+[comment]: # ""
+## Port Details
+
+The app uses HTTP/ HTTPS protocol for communicating with the Netskope server. Below are the default
+ports used by the Splunk SOAR Connector.
+
+| SERVICE NAME | TRANSPORT PROTOCOL | PORT |
+|--------------|--------------------|------|
+| http         | tcp                | 80   |
+| https        | tcp                | 443  |
+
 <div class="document">
 
 <div class="documentwrapper">
@@ -73,10 +92,6 @@ Please contact Netskope Support for any issues relating to this app.
 
 <div class="relations">
 
-### Related Topics
-
--   [Documentation overview](index.html#document-index)
-
 </div>
 
 </div>
@@ -91,7 +106,7 @@ Please contact Netskope Support for any issues relating to this app.
 
 <div class="footer">
 
-©2019, . \| Powered by [Sphinx 1.6.2](http://sphinx-doc.org/) & [Alabaster
+©2022 \| Powered by [Sphinx 1.6.2](http://sphinx-doc.org/) & [Alabaster
 0.7.10](https://github.com/bitprophet/alabaster)
 
 </div>
@@ -153,13 +168,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
 action\_result\.parameter\.file | string |  `netskope file id`  `file name` 
 action\_result\.parameter\.profile | string |  `netskope profile id`  `netskope profile name` 
 action\_result\.data\.\*\.file\_name | string |  `file name` 
 action\_result\.data\.\*\.vault\_id | string |  `vault id` 
-action\_result\.summary\.vault\_id | string |  `vault id` 
+action\_result\.status | string | 
 action\_result\.message | string | 
+action\_result\.summary\.vault\_id | string |  `vault id` 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -177,14 +192,14 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.summary\.\* | string | 
-action\_result\.message | string | 
 action\_result\.parameter\.user | string |  `netskope user`  `email`  `user name` 
-action\_result\.data\.\*\.userName | string |  `netskope user`  `user name`  `email` 
 action\_result\.data\.\*\.active | boolean | 
-action\_result\.data\.\*\.id | string |  `netskope scim user id` 
 action\_result\.data\.\*\.externalId | string |  `netskope external id` 
+action\_result\.data\.\*\.id | string |  `netskope scim user id` 
+action\_result\.data\.\*\.userName | string |  `netskope user`  `user name`  `email` 
+action\_result\.status | string | 
+action\_result\.message | string | 
+action\_result\.summary\.total\_users | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -202,13 +217,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.summary\.\* | string | 
-action\_result\.message | string | 
 action\_result\.parameter\.group | string |  `netskope group name` 
 action\_result\.data\.\*\.displayName | string |  `netskope group name` 
-action\_result\.data\.\*\.id | string |  `netskope scim group id` 
 action\_result\.data\.\*\.externalId | string |  `netskope external id` 
+action\_result\.data\.\*\.id | string |  `netskope scim group id` 
+action\_result\.status | string | 
+action\_result\.message | string | 
+action\_result\.summary\.total\_groups | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -226,12 +241,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.summary\.\* | string | 
-action\_result\.message | string | 
 action\_result\.parameter\.group | string |  `netskope group name` 
 action\_result\.data\.\*\.displayName | string | 
 action\_result\.data\.\*\.id | string |  `netskope scim group id` 
+action\_result\.status | string | 
+action\_result\.message | string | 
+action\_result\.summary\.total\_groups | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -252,15 +267,15 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.summary\.\* | string | 
-action\_result\.message | string | 
-action\_result\.parameter\.user | string |  `netskope user` 
+action\_result\.parameter\.email | string |  `netskope user`  `email` 
 action\_result\.parameter\.familyName | string | 
 action\_result\.parameter\.givenName | string | 
-action\_result\.parameter\.email | string |  `netskope user`  `email` 
-action\_result\.data\.\*\.userName | string | 
+action\_result\.parameter\.user | string |  `netskope user` 
 action\_result\.data\.\*\.id | string |  `netskope scim user id` 
+action\_result\.data\.\*\.userName | string | 
+action\_result\.status | string | 
+action\_result\.message | string | 
+action\_result\.summary\.total\_users | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -280,13 +295,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.summary\.\* | string | 
-action\_result\.message | string | 
-action\_result\.parameter\.group | string |  `netskope scim group id` 
 action\_result\.parameter\.action | string | 
+action\_result\.parameter\.group | string |  `netskope scim group id` 
 action\_result\.parameter\.user | string |  `netskope scim user id` 
 action\_result\.data\.\*\.displayName | string |  `netskope group name` 
+action\_result\.status | string | 
+action\_result\.message | string | 
+action\_result\.summary\.total\_users | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -302,7 +317,6 @@ No parameters are required for this action
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
 action\_result\.data\.\*\.file\_id | string |  `netskope file id` 
 action\_result\.data\.\*\.original\_file\_name | string |  `file name` 
 action\_result\.data\.\*\.policy | string | 
@@ -310,8 +324,9 @@ action\_result\.data\.\*\.quarantine\_profile\_id | string |  `netskope profile 
 action\_result\.data\.\*\.quarantine\_profile\_name | string |  `netskope profile name` 
 action\_result\.data\.\*\.quarantined\_file\_name | string |  `file name` 
 action\_result\.data\.\*\.user\_id | string |  `email` 
-action\_result\.summary\.total\_files | numeric | 
+action\_result\.status | string | 
 action\_result\.message | string | 
+action\_result\.summary\.total\_files | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -333,7 +348,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string | 
 action\_result\.parameter\.end\_time | numeric | 
 action\_result\.parameter\.ip | string |  `ip` 
 action\_result\.parameter\.start\_time | numeric | 
@@ -432,9 +446,10 @@ action\_result\.data\.\*\.page\.\*\.user | string |  `email`
 action\_result\.data\.\*\.page\.\*\.user\_generated | string | 
 action\_result\.data\.\*\.page\.\*\.userip | string |  `ip` 
 action\_result\.data\.\*\.page\.\*\.userkey | string |  `email` 
+action\_result\.status | string | 
+action\_result\.message | string | 
 action\_result\.summary\.total\_application\_events | numeric | 
 action\_result\.summary\.total\_page\_events | numeric | 
-action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -473,17 +488,19 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.parameter\.url | string |  `url`  `domain` 
+action\_result\.data | string | 
 action\_result\.status | string | 
 action\_result\.message | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
+action\_result\.summary\.set\_list | string | 
+action\_result\.summary\.total\_urls | numeric | 
+action\_result\.summary\.total\_files | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
 ## action: 'remove url'
 Remove an URL from the Netskope URL Blocklist
 
-Type: **contain**  
+Type: **correct**  
 Read only: **False**
 
 #### Action Parameters
@@ -495,10 +512,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.parameter\.url | string |  `url`  `domain` 
+action\_result\.data | string | 
 action\_result\.status | string | 
 action\_result\.message | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
+action\_result\.summary\.remove\_msg | string | 
+action\_result\.summary\.total\_urls | numeric | 
+action\_result\.summary\.total\_files | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -514,10 +533,10 @@ No parameters are required for this action
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.data | string | 
 action\_result\.status | string | 
 action\_result\.message | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
+action\_result\.summary\.total\_files | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -536,17 +555,19 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.parameter\.hash | string |  `hash`  `md5` 
+action\_result\.data | string | 
 action\_result\.status | string | 
 action\_result\.message | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
+action\_result\.summary\.set\_list | string | 
+action\_result\.summary\.total\_files | numeric | 
+action\_result\.summary\.total\_hashes | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
 ## action: 'remove hash'
 Remove a hash from the Netskope file hash list
 
-Type: **contain**  
+Type: **correct**  
 Read only: **False**
 
 #### Action Parameters
@@ -558,10 +579,11 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.parameter\.hash | string |  `hash`  `md5` 
+action\_result\.data | string | 
 action\_result\.status | string | 
 action\_result\.message | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
+action\_result\.summary\.remove\_msg | string | 
+action\_result\.summary\.total\_files | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -577,9 +599,9 @@ No parameters are required for this action
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.data | string | 
 action\_result\.status | string | 
 action\_result\.message | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
+action\_result\.summary\.total\_files | numeric | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric | 

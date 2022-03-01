@@ -1,6 +1,6 @@
 # File: netskope_consts.py
 #
-# Copyright (c) 2018-2022 Splunk Inc.
+# Copyright 2018-2022 Netskope, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,3 +49,9 @@ NETSKOPE_DEFAULT_LIMIT = 50
 NETSKOPE_URL_LIST = 'netskope_url_list'
 NETSKOPE_FILE_LIST = 'netskope_file_list'
 NETSKOPE_LIST_NAME = 'list_name'
+NETSKOPE_STATE_FILE_CORRUPT_ERR = (
+    "Error occurred while loading the state file due to its unexpected format. "
+    "Resetting the state file with the default format. Please try again."
+)
+# Timeout
+NETSKOPE_DEFAULT_TIMEOUT = 30

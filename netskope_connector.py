@@ -128,7 +128,7 @@ class NetskopeConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR,
                     ('Unable to parse JSON response. Error: {0}').format(str(e))), None)
 
-        if 200 <= response.status_code < 399 and resp_json.get('error', '') == 'error':
+        if 200 <= response.status_code < 399 and resp_json.get('status', '') == 'error':
             error_message = response.text.replace('{', '{{').replace('}', '}}')
             if resp_json.get('errors') and isinstance(resp_json['errors'], list):
                 error_message = (' ').join(resp_json['errors'])
@@ -276,7 +276,6 @@ class NetskopeConnector(BaseConnector):
             self._server_url = self._unicode_string_handler(config[NETSKOPE_CONFIG_SERVER_URL]).strip('/')
             self._tenant = self._server_url.split('//')[1]
             self._api_key = config[NETSKOPE_CONFIG_API_KEY]
-            self._list_name = self._unicode_string_handler(config[NETSKOPE_LIST_NAME])
             self._log.info(('tenant={}').format(self._tenant))
         except Exception:
             self.debug_print('Error while initializing server URL and basic connection parameters from the asset configuration')
@@ -1742,19 +1741,19 @@ class NetskopeConnector(BaseConnector):
         """
         self.save_progress(('In action handler for: {0}').format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        ret_val = self._update_url_helper(action_result, "update_url")
+        ret_val = self._update_url_helper(action_result)
         if phantom.is_fail(ret_val):
             return action_result.get_status()
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _update_url_helper(self, action_result, action_name=None):
+    def _update_url_helper(self, action_result):
         """ Helper function for updating URL."""
         try:
-            config = self.get_config()
             exists, message, content = self.get_url_list()
+            content = [element.strip() for element in content if element.strip()]
+            if not content:
+                return action_result.set_status(phantom.APP_ERROR, "No content found to update the url list")
             params = {'list': (',').join(content), 'name': self._list_name}
-            if(action_name == "update_url"):
-                params.update({'name': self._unicode_string_handler(config[NETSKOPE_LIST_NAME])})
             self._log.info(('action=get_url_list exists={} message={} content_length={}').format(exists, message, len(content)))
             request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_URL_LIST_ENDPOINT,
                     action_result=action_result, params=params)
@@ -1762,7 +1761,7 @@ class NetskopeConnector(BaseConnector):
                 return action_result.get_status()
             action_result.add_data({})
             summary = action_result.update_summary({})
-            summary['total_files'] = action_result.get_data_size()
+            summary['total_urls'] = len(content)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -1792,10 +1791,10 @@ class NetskopeConnector(BaseConnector):
         self._log.debug(('unique_list={}').format(url_list))
         status, set_msg = phantom_rules.set_list(list_name=self._url_list, values=[ [x] for x in url_list ])
         self._log.info(('action=set_list status={} msg={}').format(status, set_msg))
-        ret_val = self._update_url_helper(action_result)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-        summary = action_result.update_summary({'set_list': set_msg})
+
+        summary = action_result.update_summary({})
+        if set_msg != NETSKOPE_MISSING_MESSAGE:
+            summary['set_list'] = set_msg
         summary['total_urls'] = len(url_list)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1823,9 +1822,7 @@ class NetskopeConnector(BaseConnector):
             status, set_msg = phantom_rules.set_list(list_name=self._url_list, values=[[]])
             remove_msg = 'Deleted Single Row'
         self._log.info(('action=delete_from_list status={} msg={}').format(status, remove_msg))
-        ret_val = self._update_url_helper(action_result)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+
         status, msg, list_items = self.get_url_list()
         summary = action_result.update_summary({'remove_msg': remove_msg})
         summary['total_urls'] = len(list_items)
@@ -1968,6 +1965,9 @@ class NetskopeConnector(BaseConnector):
         """ Helper function for updating file list. """
         try:
             exists, message, content = self.get_file_list()
+            content = [element.strip() for element in content if element.strip()]
+            if not content:
+                return action_result.set_status(phantom.APP_ERROR, "No content found to update the file hash list")
             params = {'list': (',').join(content), 'name': self._list_name}
             self._log.info(('action=get_file_list exists={} message={} content_length={}').format(exists, message, len(content)))
             request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_FILE_LIST_ENDPOINT,
@@ -1976,7 +1976,7 @@ class NetskopeConnector(BaseConnector):
                 return action_result.get_status()
             action_result.add_data({})
             summary = action_result.update_summary({})
-            summary['total_files'] = action_result.get_data_size()
+            summary['total_hashes'] = len(content)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2002,10 +2002,10 @@ class NetskopeConnector(BaseConnector):
         self._log.debug(('unique_list={}').format(file_list))
         status, set_msg = phantom_rules.set_list(list_name=self._file_list, values=[ [x] for x in file_list ])
         self._log.info(('action=set_list status={} msg={}').format(status, set_msg))
-        ret_val = self._update_file_helper(action_result)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-        summary = action_result.update_summary({'set_list': set_msg})
+
+        summary = action_result.update_summary({})
+        if set_msg != NETSKOPE_MISSING_MESSAGE:
+            summary['set_list'] = set_msg
         summary['total_hashes'] = len(file_list)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -2029,9 +2029,7 @@ class NetskopeConnector(BaseConnector):
             status, set_msg = phantom_rules.set_list(list_name=self._file_list, values=[[]])
             remove_msg = 'Deleted Single Row'
         self._log.info(('action=delete_from_list status={} msg={}').format(status, remove_msg))
-        ret_val = self._update_file_helper(action_result)
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+
         status, msg, list_items = self.get_file_list()
         self._log.info(('action=after_delete_from_list status={} msg={} list_length={}').format(status, msg, len(list_items)))
         summary = action_result.update_summary({'remove_msg': remove_msg})
@@ -2102,27 +2100,33 @@ class NetskopeConnector(BaseConnector):
         extra initialization of any internal modules. This function MUST return a value phantom.APP_SUCCESS.
         """
         self._log.info('action=initialize status=start')
+
         self._state = self.load_state()
         self._log.info(('action=initialize state={}').format(self._state))
         if not isinstance(self._state, dict):
             self.debug_print("Resetting the state file with the default format")
             self._state = {"app_version": self.get_app_json().get("app_version")}
             return self.set_status(phantom.APP_ERROR, NETSKOPE_STATE_FILE_CORRUPT_ERR)
+
         config = self.get_config()
         self._file_list = ('{}_{}').format(self._unicode_string_handler(config.get(NETSKOPE_LIST_NAME, '')), NETSKOPE_FILE_LIST)
         self._url_list = ('{}_{}').format(self._unicode_string_handler(config.get(NETSKOPE_LIST_NAME, '')), NETSKOPE_URL_LIST)
+
         self._scim['url'] = self._unicode_string_handler(config.get('scim_url', ''))
         self._scim['token'] = config.get('scim_key', '')
+
         list_status, message, list_contents = self.get_url_list()
-        self._log.info(('action=get_url_list status={} message={} contents_length={}').format(list_status, message,
-                len(list_contents)))
+        self._log.info(('action=get_url_list status={} message={} contents_length={}').format(list_status, message, len(list_contents)))
         if not list_status:
             self._log.info(('action=create_url_list return={}').format(self.create_url_list()))
+
         list_status, message, list_contents = self.get_file_list()
-        self._log.info(('action=get_file_list status={} message={} contents_length={}').format(list_status, message,
-                len(list_contents)))
+        self._log.info(('action=get_file_list status={} message={} contents_length={}').format(list_status, message, len(list_contents)))
         if not list_status:
             self._log.info(('action=create_file_list return={}').format(self.create_file_list()))
+
+        # Initialize list name
+        self._list_name = self._unicode_string_handler(config.get(NETSKOPE_LIST_NAME, ""))
 
         return phantom.APP_SUCCESS
 

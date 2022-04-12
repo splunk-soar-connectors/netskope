@@ -53,5 +53,7 @@ NETSKOPE_STATE_FILE_CORRUPT_ERR = (
     "Error occurred while loading the state file due to its unexpected format. "
     "Resetting the state file with the default format. Please try again."
 )
+NETSKOPE_MISSING_MESSAGE = "MISSING MESSAGE"
+
 # Timeout
 NETSKOPE_DEFAULT_TIMEOUT = 30

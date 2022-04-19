@@ -2,11 +2,11 @@
 # Netskope
 
 Publisher: Netskope  
-Connector Version: 2\.2\.0  
+Connector Version: 2\.3\.1  
 Product Vendor: Netskope  
 Product Name: Netskope  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.1\.0  
+Minimum Product Version: 5\.2\.0  
 
 This app integrates with the Netskope to execute various investigative and polling actions
 
@@ -24,6 +24,19 @@ This app integrates with the Netskope to execute various investigative and polli
 [comment]: # "  either express or implied. See the License for the specific language governing permissions"
 [comment]: # "  and limitations under the License."
 [comment]: # ""
+## Playbook Backward Compatibility
+
+-   The 'total_files' summary key has been replaced with the 'total_urls' key in output data paths
+    for 'update url' action. This key will represent the total URLs updated on Netskope UI. Hence,
+    it is requested to the end-user to please update their existing playbooks by re-inserting \|
+    modifying \| deleting the corresponding action blocks to ensure the correct functioning of the
+    playbooks created on the earlier versions of the app.
+-   The 'total_files' summary key has been replaced with the 'total_hashes' key in output data paths
+    for 'update hash' action. This key will represent the total hashes updated on Netskope UI.
+    Hence, it is requested to the end-user to please update their existing playbooks by re-inserting
+    \| modifying \| deleting the corresponding action blocks to ensure the correct functioning of
+    the playbooks created on the earlier versions of the app.
+
 ## Port Details
 
 The app uses HTTP/ HTTPS protocol for communicating with the Netskope server. Below are the default

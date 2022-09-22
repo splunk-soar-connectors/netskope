@@ -2872,16 +2872,12 @@
     "pip_dependencies": {
         "wheel": [
             {
-                "module": "backports.functools_lru_cache",
-                "input_file": "wheels/backports.functools_lru_cache-1.6.4-py2.py3-none-any.whl"
-            },
-            {
                 "module": "beautifulsoup4",
                 "input_file": "wheels/beautifulsoup4-4.9.1-py3-none-any.whl"
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/certifi-2022.9.14-py3-none-any.whl"
             },
             {
                 "module": "chardet",
@@ -2897,11 +2893,11 @@
             },
             {
                 "module": "soupsieve",
-                "input_file": "wheels/soupsieve-1.9.6-py2.py3-none-any.whl"
+                "input_file": "wheels/soupsieve-2.3.2.post1-py3-none-any.whl"
             },
             {
                 "module": "urllib3",
-                "input_file": "wheels/urllib3-1.26.7-py2.py3-none-any.whl"
+                "input_file": "wheels/urllib3-1.26.12-py2.py3-none-any.whl"
             }
         ]
     }

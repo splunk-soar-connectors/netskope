@@ -91,8 +91,8 @@ class NetskopeConnector(BaseConnector):
         if response.status_code >= 200 and response.status_code < 300:
             return RetVal(phantom.APP_SUCCESS, {})
         else:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Empty response and no information in the header. Status Code: {0}').format(response.status_code)),
-                          None)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, ('Empty response and no information in the header. \
+                           Status Code: {0}').format(response.status_code)), None)
 
     @staticmethod
     def _process_html_response(response, action_result):
@@ -211,11 +211,12 @@ class NetskopeConnector(BaseConnector):
                 except Exception as e:
                     error_msg = self._get_error_message_from_exception(e)
                     self.debug_print('Error while encoding server URL')
-                    return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error while encoding server URL: {0}').format(error_msg)), resp_json)
+                    return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error while encoding server \
+                                   URL: {0}').format(error_msg)), resp_json)
             else:
                 self.debug_print("Please configure both 'SCIM Server URL' and 'SCIM Token' in asset settings to execute this action")
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Please configure both 'SCIM Server URL' and 'SCIM Token' in asset settings to execute this action"),
-                              resp_json)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Please configure both 'SCIM Server URL' and 'SCIM Token' \
+                               in asset settings to execute this action"), resp_json)
 
             try:
                 request_func = getattr(requests, method)
@@ -228,7 +229,8 @@ class NetskopeConnector(BaseConnector):
             if method == 'post' or method == 'patch':
                 headers['Content-Type'] = 'application/scim+json'
 
-            self._log.info(('action=make_scim_rest method={0} url={1} params={2} function={3}').format(method, url, json.dumps(params), request_func))
+            self._log.info(('action=make_scim_rest method={0} url={1} params={2} \
+                             function={3}').format(method, url, json.dumps(params), request_func))
             temp_file_path = ('{dir}{asset}_temp_file').format(dir=self.get_state_dir(), asset=self.get_asset_id())
 
             try:
@@ -296,8 +298,8 @@ class NetskopeConnector(BaseConnector):
             self._log.info(('tenant={0}').format(self._tenant))
         except Exception:
             self.debug_print('Error while initializing server URL and basic connection parameters from the asset configuration')
-            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error while initializing server URL and basic connection parameters from the asset configuration'),
-                          resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error while initializing server URL and basic \
+                           connection parameters from the asset configuration'), resp_json)
 
         # v2 REST endpoints need API token in request header whereas
         # token is provided in request params in case of v1 REST endpoints
@@ -319,7 +321,8 @@ class NetskopeConnector(BaseConnector):
             # for the get_file action fetch the file data in stream and store the same in the Splunk SOAR
             if action == 'get_file' and params.get('op', '') == 'download-url':
                 with request_func(url, params=params, timeout=timeout, stream=True) as (requests_response):
-                    error_response_expr = 'json' in requests_response.headers.get('Content-Type', '') and requests_response.json().get('error', '') == 'error'
+                    error_response_expr = 'json' in requests_response.headers.get('Content-Type', '') and \
+                                          requests_response.json().get('error', '') == 'error'
 
                     if 200 <= requests_response.status_code < 399 and not error_response_expr:
                         with open(temp_file_path, 'wb') as (temp_file):
@@ -364,7 +367,8 @@ class NetskopeConnector(BaseConnector):
         # Checking connectivity for v1 API if v1 api key provided
         if self._api_key:
             self.save_progress(NETSKOPE_CONNECTION_MSG)
-            ret_val, _ = self._make_rest_call(endpoint=NETSKOPE_CONNECTIVITY_ENDPOINT, action_result=action_result, params=request_param, timeout=30)
+            ret_val, _ = self._make_rest_call(endpoint=NETSKOPE_CONNECTIVITY_ENDPOINT, action_result=action_result,
+                                              params=request_param, timeout=30)
 
             if phantom.is_fail(ret_val):
                 self.save_progress(NETSKOPE_CONNECTIVITY_FAIL_MSG)
@@ -399,7 +403,8 @@ class NetskopeConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         file_param = param[NETSKOPE_JSON_FILE]
         profile_param = param[NETSKOPE_JSON_PROFILE]
-        details_status, file_id, file_name, profile_id = self._get_file_and_profile_details(action_result=action_result, file_param=file_param, profile_param=profile_param)
+        details_status, file_id, file_name, profile_id = self._get_file_and_profile_details(action_result=action_result,
+                                                                                            file_param=file_param, profile_param=profile_param)
 
         if phantom.is_fail(details_status):
             return action_result.get_status()
@@ -429,7 +434,8 @@ class NetskopeConnector(BaseConnector):
                     vault_id = vault_file_item['vault_id']
                     break
             else:
-                success, message, vault_add_file_dict = vault.vault_add(container=self.get_container_id(), file_location=temp_file_path, file_name=file_name)
+                success, message, vault_add_file_dict = vault.vault_add(container=self.get_container_id(),
+                                                                        file_location=temp_file_path, file_name=file_name)
 
                 if not success:
                     return action_result.set_status(phantom.APP_ERROR, message)
@@ -452,7 +458,8 @@ class NetskopeConnector(BaseConnector):
         :return: status (success, failure), file_id, file_name, profile_id
         """
         request_params = {'op': 'get-files'}
-        request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_QUARANTINE_ENDPOINT, action_result=action_result, params=request_params)
+        request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_QUARANTINE_ENDPOINT,
+                                                                action_result=action_result, params=request_params)
 
         if phantom.is_fail(request_status):
             return (action_result.get_status(), None, None, None)
@@ -500,7 +507,8 @@ class NetskopeConnector(BaseConnector):
         self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         params = {'op': NETSKOPE_PARAM_LIST_FILES}
-        request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_QUARANTINE_ENDPOINT, action_result=action_result, params=params)
+        request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_QUARANTINE_ENDPOINT,
+                                                                action_result=action_result, params=params)
 
         if phantom.is_fail(request_status):
             return action_result.get_status()
@@ -602,7 +610,8 @@ class NetskopeConnector(BaseConnector):
             action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, ("Failed to get 'application' events. Error: {0}").format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, ("Failed to get 'application' events. \
+                                                                Error: {0}").format(action_result.get_message()))
 
         if application_event_list:
             event_details['application'] = application_event_list
@@ -713,7 +722,8 @@ class NetskopeConnector(BaseConnector):
         """
         container_dict = dict()
         self._log.info(('alert={0}').format(json.dumps(alert)))
-        container_dict['name'] = ('{alert_name}-{id}-{type}').format(alert_name=alert['alert_name'], id=alert.get('_id', ('unk-{0}').format(uuid.uuid4())),
+        container_dict['name'] = ('{alert_name}-{id}-{type}').format(alert_name=alert['alert_name'],
+                                                                     id=alert.get('_id', ('unk-{0}').format(uuid.uuid4())),
                                                                      type=alert.get('alert_type', 'unknown'))
         container_dict['source_data_identifier'] = container_dict['name']
         container_dict['start_time'] = ('{time}Z').format(time=datetime.utcfromtimestamp(alert['timestamp']).isoformat())
@@ -1362,7 +1372,8 @@ class NetskopeConnector(BaseConnector):
                 }
 
                 # push the url list data to the Netskope server
-                request_status, _ = self._make_rest_call(endpoint=(('{0}/replace').format(url_list_endpoint)), action_result=action_result, data=data, method='patch')
+                request_status, _ = self._make_rest_call(endpoint=(('{0}/replace').format(url_list_endpoint)),
+                                                         action_result=action_result, data=data, method='patch')
 
                 if phantom.is_fail(request_status):
                     self._log.error(('failed to update {0} url_list on the Netskope').format(self._list_name))
@@ -1478,7 +1489,8 @@ class NetskopeConnector(BaseConnector):
         :return: (status success/failure, URL list ID)
         """
         request_params = {'field': ['id', 'name']}
-        request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_V2_URL_LIST_ENDPOINT, action_result=action_result, params=request_params)
+        request_status, request_response = self._make_rest_call(endpoint=NETSKOPE_V2_URL_LIST_ENDPOINT,
+                                                                action_result=action_result, params=request_params)
 
         if phantom.is_fail(request_status):
             return action_result.get_status(), None
@@ -1488,7 +1500,8 @@ class NetskopeConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_SUCCESS), list_details.get('id')
 
         return action_result.set_status(phantom.APP_ERROR,
-                                        'Error: A URL List object with the name provided does not exist on the Netskope. Create one first.'), None
+                                        'Error: A URL List object with the name provided does not \
+                                            exist on the Netskope. Create one first.'), None
 
     def _handle_scim_get_groups(self, param):
         """Get SCIM groups.
@@ -1504,7 +1517,8 @@ class NetskopeConnector(BaseConnector):
                 param['filter'] = ('displayName eq "{0}"').format(param[NETSKOPE_PARAM_GROUP])
 
             self._log.debug(('action=make_scim_rest_call params={0}').format(param))
-            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT, action_result=action_result, params=param)
+            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT,
+                                                                         action_result=action_result, params=param)
 
             if phantom.is_fail(request_status):
                 return action_result.get_status()
@@ -1534,7 +1548,8 @@ class NetskopeConnector(BaseConnector):
                 param['filter'] = ('userName eq "{0}"').format(param[NETSKOPE_PARAM_USER])
 
             self._log.debug(('action=make_scim_rest_call params={0}').format(param))
-            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_USERS_ENDPOINT, action_result=action_result, params=param)
+            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_USERS_ENDPOINT,
+                                                                         action_result=action_result, params=param)
 
             if phantom.is_fail(request_status):
                 return action_result.get_status()
@@ -1569,7 +1584,8 @@ class NetskopeConnector(BaseConnector):
                 'schemas': ['urn:ietf:params:scim:api:messages:2.0:PatchOp']
             }
             self._log.info(('action=make_scim_rest_call params={0}').format(data))
-            request_status, request_response = self._make_scim_rest_call(endpoint=('{0}/{1}').format(NETSKOPE_SCIM_GROUPS_ENDPOINT, param[NETSKOPE_PARAM_GROUP]),
+            request_status, request_response = self._make_scim_rest_call(endpoint=('{0}/{1}').format(NETSKOPE_SCIM_GROUPS_ENDPOINT,
+                                                                                                     param[NETSKOPE_PARAM_GROUP]),
                                                                          action_result=action_result, params=data, method='patch')
 
             if phantom.is_fail(request_status):
@@ -1600,7 +1616,8 @@ class NetskopeConnector(BaseConnector):
             data = {'displayName': param[NETSKOPE_PARAM_GROUP],
                     'schemas': ['urn:ietf:params:scim:schemas:core:2.0:Group']}
             self._log.info(('action=make_scim_rest_call params={0}').format(data))
-            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT, action_result=action_result, params=data, method='post')
+            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT,
+                                                                         action_result=action_result, params=data, method='post')
 
             if phantom.is_fail(request_status):
                 return action_result.get_status()
@@ -1633,7 +1650,8 @@ class NetskopeConnector(BaseConnector):
                 'schemas': ['urn:ietf:params:scim:schemas:core:2.0:User']
             }
             self._log.info(('action=make_scim_rest_call params={0}').format(data))
-            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_USERS_ENDPOINT, action_result=action_result, params=data, method='post')
+            request_status, request_response = self._make_scim_rest_call(endpoint=NETSKOPE_SCIM_USERS_ENDPOINT,
+                                                                         action_result=action_result, params=data, method='post')
 
             if phantom.is_fail(request_status):
                 return action_result.get_status()

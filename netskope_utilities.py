@@ -20,7 +20,8 @@ from logging import handlers
 
 
 class KennyLoggins:
-    """ Base Class for Logging """
+    """Base Class for Logging"""
+
     __module__ = __name__
 
     def __init__(self, **kwargs):
@@ -28,6 +29,7 @@ class KennyLoggins:
         pass
 
     def get_logger(self, app_name=None, file_name='kenny_loggins', log_level=logging.INFO, version='unknown'):
+        """Initialize Logger"""
         log_location = ('{}{}').format(os.path.sep, os.path.join('var', 'log', 'phantom', 'apps', app_name))
         _log = logging.getLogger(('{}/{}').format(app_name, file_name))
         _log.propogate = False
@@ -57,8 +59,10 @@ class KennyLoggins:
 
 
 class netskope_utils:
+    """Basic util class"""
 
     def __init__(self):
+        """Construct an instance of the basic utils class"""
         kl = KennyLoggins()
         self._log = kl.get_logger(app_name='netskope_utils', file_name='netskope_utils')
 
@@ -76,11 +80,11 @@ class netskope_utils:
         self._log.info(('validating_config item={} item_config={} key={}').format(item, item_config, key))
         if 'validation' not in item_config:
             return False
-        si = [('{}: {}').format(key, x) for x in [self._check_single_validation(x,
-            item) for x in item_config.get('validation')] if x]
+        si = [('{}: {}').format(key, x) for x in [self._check_single_validation(x, item) for x in item_config.get('validation')] if x]
         if len(si) < 1:
             return False
         return (', ').join(si)
 
     def validate_app_configuration(self, ac, config):
-        return [ self._validate_configuration(config.get(x, ''), ac[x], x) for x in ac ]
+        """Validate app configuration"""
+        return [self._validate_configuration(config.get(x, ''), ac[x], x) for x in ac]

@@ -10,14 +10,17 @@
     "product_version_regex": ".*",
     "publisher": "Netskope",
     "license": "Copyright 2018-2022 Netskope, Inc.",
-    "app_version": "2.3.1",
+    "app_version": "3.0.0",
     "utctime_updated": "2022-01-21T22:23:47.000000Z",
     "package_name": "phantom_netskope",
     "main_module": "netskope_connector.py",
-    "min_phantom_version": "5.2.0",
+    "min_phantom_version": "5.3.3",
     "app_wizard_version": "1.0.0",
-    "python_version": "2.7",
+    "python_version": "3",
     "fips_compliant": false,
+    "latest_tested_version": [
+        "98.0.3.20"
+    ],
     "configuration": {
         "server_url": {
             "description": "Server URL",
@@ -25,10 +28,9 @@
             "required": true,
             "order": 0
         },
-        "api_key": {
-            "description": "API Key",
+        "v2_api_key": {
+            "description": "v2 API Key (recommended)",
             "data_type": "password",
-            "required": true,
             "order": 1
         },
         "scim_url": {
@@ -42,10 +44,15 @@
             "order": 3
         },
         "list_name": {
-            "description": "Netskope List Name (both Url and File Hash)",
+            "description": "Netskope List Name (both URL and file hash)",
             "data_type": "string",
             "order": 4,
             "default": "phantom_list"
+        },
+        "api_key": {
+            "description": "v1 API Key",
+            "data_type": "password",
+            "order": 5
         }
     },
     "actions": [
@@ -90,6 +97,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.file",
                     "data_type": "string",
@@ -141,21 +156,6 @@
                     "column_name": "Vault ID"
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Vault id: d211433b0b9dba7e429618df77f1d9c6573627ed"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.vault_id",
                     "data_type": "string",
                     "example_values": [
@@ -163,6 +163,13 @@
                     ],
                     "contains": [
                         "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Vault id: d211433b0b9dba7e429618df77f1d9c6573627ed"
                     ]
                 },
                 {
@@ -206,12 +213,23 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.user",
                     "data_type": "string",
                     "contains": [
                         "netskope user",
                         "email",
                         "user name"
+                    ],
+                    "example_values": [
+                        "test user"
                     ]
                 },
                 {
@@ -219,6 +237,28 @@
                     "data_type": "boolean",
                     "column_name": "Active",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "work"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "casey.ingram@sailpoint.com"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.externalId",
@@ -239,6 +279,14 @@
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.data.*.name.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name.givenName",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.userName",
                     "data_type": "string",
                     "contains": [
@@ -250,22 +298,17 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_users",
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 1"
                     ]
                 },
                 {
@@ -307,6 +350,14 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.group",
                     "data_type": "string",
                     "contains": [
@@ -341,22 +392,24 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.status",
+                    "data_path": "action_result.data.*.meta.resourceType",
                     "data_type": "string",
                     "example_values": [
-                        "success",
-                        "failed"
+                        "Group"
                     ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.total_groups",
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total groups: 1"
                     ]
                 },
                 {
@@ -399,10 +452,21 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.group",
                     "data_type": "string",
                     "contains": [
                         "netskope group name"
+                    ],
+                    "example_values": [
+                        "netskope user group"
                     ]
                 },
                 {
@@ -421,22 +485,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_groups",
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total groups: 1"
                     ]
                 },
                 {
@@ -500,26 +559,70 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.email",
                     "data_type": "string",
                     "contains": [
                         "netskope user",
                         "email"
+                    ],
+                    "example_values": [
+                        "test@gmail.com"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.familyName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test family"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.givenName",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test name"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.user",
                     "data_type": "string",
                     "contains": [
                         "netskope user"
+                    ],
+                    "example_values": [
+                        "test user",
+                        "test@gmail.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.active",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.primary",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.emails.*.value",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.test@xyz.com"
                     ]
                 },
                 {
@@ -532,28 +635,45 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.mail",
+                    "data_type": "string",
+                    "example_values": [
+                        "test.test@xyz.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name.familyName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.name.givenName",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "numeric",
+                    "example_values": [
+                        201
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.userName",
                     "data_type": "string",
                     "column_name": "Username",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_users",
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 1"
                     ]
                 },
                 {
@@ -613,11 +733,19 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.action",
                     "data_type": "string",
                     "example_values": [
                         "add",
-                        "delete"
+                        "remove"
                     ]
                 },
                 {
@@ -625,6 +753,9 @@
                     "data_type": "string",
                     "contains": [
                         "netskope scim group id"
+                    ],
+                    "example_values": [
+                        "011d0b10-9176-46ac-bb01-10e15949d26c"
                     ]
                 },
                 {
@@ -632,6 +763,10 @@
                     "data_type": "string",
                     "contains": [
                         "netskope scim user id"
+                    ],
+                    "example_values": [
+                        "test@gmail.com",
+                        "6f1209b4-a3c0-4266-a53b-0f0858480ed6"
                     ]
                 },
                 {
@@ -644,22 +779,17 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.total_users",
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 0"
                     ]
                 },
                 {
@@ -690,6 +820,14 @@
             "read_only": true,
             "parameters": {},
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.data.*.file_id",
                     "data_type": "string",
@@ -772,11 +910,10 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
                     "example_values": [
-                        "success",
-                        "failed"
+                        12
                     ]
                 },
                 {
@@ -784,13 +921,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Total files: 12"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.total_files",
-                    "data_type": "numeric",
-                    "example_values": [
-                        12
                     ]
                 },
                 {
@@ -817,7 +947,7 @@
             "action": "run query",
             "identifier": "run_query",
             "description": "Run query for events on a given IP",
-            "verbose": "<ul><li>If no &quotstart_time&quot and &quotend_time&quot is provided, the action will take the last 24 hours as the time period.<li>If only &quotstart_time&quot is provided, current time would be taken as &quotend_time&quot.<li>If only &quotend_time&quot is provided, 24 hours prior to &quotend_time&quot would be taken as &quotstart_time&quot.</ul>",
+            "verbose": "<ul><li>If no &quotstart_time&quot and &quotend_time&quot is provided, the action will take the last 24 hours as the time period.<li>If only &quotstart_time&quot is provided, current time would be taken as &quotend_time&quot.<li>If only &quotend_time&quot is provided, 24 hours prior to &quotend_time&quot would be taken as &quotstart_time&quot.<li>The action only returns page and application events for the given IP.</ul>",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -843,6 +973,14 @@
                 }
             },
             "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
                 {
                     "data_path": "action_result.parameter.end_time",
                     "data_type": "numeric",
@@ -875,10 +1013,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.application.*._insertion_epoch_timestamp",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.application.*.access_method",
+                    "data_type": "string",
                     "example_values": [
-                        1528210854
+                        "Client"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.act_user",
+                    "data_type": "string",
+                    "example_values": [
+                        "Introspection"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "alert"
                     ]
                 },
                 {
@@ -903,6 +1055,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.app_activity",
+                    "data_type": "string",
+                    "example_values": [
+                        "DOWNLOAD"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.app_session_id",
                     "data_type": "numeric",
                     "example_values": [
@@ -917,10 +1076,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.appsuite",
+                    "data_type": "string",
+                    "example_values": [
+                        "Amazon"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.browser",
                     "data_type": "string",
                     "example_values": [
                         "Opera"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.browser_session_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7415008769063249572
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.browser_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "104.0.0.0"
                     ]
                 },
                 {
@@ -945,10 +1125,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.connection_id",
+                    "data_type": "numeric"
+                },
+                {
                     "data_path": "action_result.data.*.application.*.count",
                     "data_type": "numeric",
                     "example_values": [
                         2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.data_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/x-protobuf"
                     ]
                 },
                 {
@@ -959,16 +1150,51 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.device_classification",
+                    "data_type": "string",
+                    "example_values": [
+                        "unmanaged"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.dst_country",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.dst_geoip_src",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.dst_latitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        37.1835
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.application.*.dst_location",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.dst_longitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -121.7714
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.dst_region",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.dst_timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.application.*.dst_zipcode",
@@ -985,6 +1211,34 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.encrypt_failure",
+                    "data_type": "string",
+                    "example_values": [
+                        "Failed getting encryption Key via KMIP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.file_category",
+                    "data_type": "string",
+                    "example_values": [
+                        "File Type Not Detected"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.file_size",
+                    "data_type": "numeric",
+                    "example_values": [
+                        23324
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.file_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "application/octet-stream"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.from_object",
                     "data_type": "string",
                     "example_values": [
@@ -992,13 +1246,27 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.from_storage",
+                    "data_type": "string",
+                    "example_values": [
+                        "army-national-guard-fonts"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.from_user",
                     "data_type": "string",
                     "example_values": [
-                        "bloomberg@bloomberg.com"
+                        "test@test.com"
                     ],
                     "contains": [
                         "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "N26-AD"
                     ]
                 },
                 {
@@ -1009,10 +1277,70 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.incident_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6052068333335426188
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.instance_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "public-link"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.managed_app",
+                    "data_type": "string",
+                    "example_values": [
+                        "no"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.managementID",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.md5",
+                    "data_type": "string",
+                    "example_values": [
+                        "f80cb839ed6c628161d8a12b5bebda9c"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.netskope_activity",
+                    "data_type": "string",
+                    "example_values": [
+                        "True"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.netskope_pop",
+                    "data_type": "string",
+                    "example_values": [
+                        "US-SF37"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.nsdeviceuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "585CE196-AF22-777B-5FDA-94F762F5836D"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.object",
                     "data_type": "string",
                     "example_values": [
                         "cutomer_list.pdf"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.object_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "997124009987"
                     ]
                 },
                 {
@@ -1026,7 +1354,7 @@
                     "data_path": "action_result.data.*.application.*.org",
                     "data_type": "string",
                     "example_values": [
-                        "kkrlogistics.com"
+                        "kkrlosktest.com"
                     ],
                     "contains": [
                         "domain"
@@ -1044,6 +1372,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.os_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows Server 2012 R2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.page",
+                    "data_type": "string",
+                    "example_values": [
+                        "cdn.flashtalking.com/94611/fonts/tu11k1r8ozm2ttu90j9uodje3rx0mvxxq4w8g1zb.woff2"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.page_id",
                     "data_type": "numeric",
                     "example_values": [
@@ -1051,10 +1393,56 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.page_site",
+                    "data_type": "string",
+                    "example_values": [
+                        "flashtalking"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.policy",
                     "data_type": "string",
                     "example_values": [
                         "Download exceed limits"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.policy_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "C40E02BACAD3F943BADH9933AEBE89BB 2022-08-16 02:48:08.232480"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTPS/1.1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.referer",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://cdn.flashtalking.com/153624/5787226/assets/style.css"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.request_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2390695089728323584
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.sanctioned_instance",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
                     ]
                 },
                 {
@@ -1069,6 +1457,13 @@
                     "data_type": "string",
                     "example_values": [
                         "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.src_geoip_src",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -1100,6 +1495,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.src_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "Wed Aug 31 21:10:00 2022"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.src_timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.src_zipcode",
                     "data_type": "string",
                     "example_values": [
@@ -1117,11 +1526,29 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.suppression_end_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1662299940
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.suppression_start_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1662299919
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.sv",
                     "data_type": "string",
                     "example_values": [
                         "unknown"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.telemetry_app",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.application.*.timestamp",
@@ -1134,7 +1561,7 @@
                     "data_path": "action_result.data.*.application.*.to_user",
                     "data_type": "string",
                     "example_values": [
-                        "john@contoso.com"
+                        "test@codsoso.com"
                     ],
                     "contains": [
                         "email"
@@ -1148,10 +1575,38 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.transaction_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6052010733335426188
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.tss_mode",
+                    "data_type": "string",
+                    "example_values": [
+                        "inline"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.type",
                     "data_type": "string",
                     "example_values": [
                         "nspolicy"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.universal_connector",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.ur_normalized",
+                    "data_type": "string",
+                    "example_values": [
+                        "osdf@test.com"
                     ]
                 },
                 {
@@ -1175,6 +1630,41 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.application.*.user_category",
+                    "data_type": "string",
+                    "example_values": [
+                        "Internal"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "test+boxent@netskope.com"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.user_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.user_role",
+                    "data_type": "string",
+                    "example_values": [
+                        "Coadmin"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.useragent",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.application.*.userip",
                     "data_type": "string",
                     "example_values": [
@@ -1188,10 +1678,17 @@
                     "data_path": "action_result.data.*.application.*.userkey",
                     "data_type": "string",
                     "example_values": [
-                        "Aaron.Etheridge@kkrlogistics.com"
+                        "Test.Etderidge@kkrltestics.com"
                     ],
                     "contains": [
                         "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.application.*.web_universal_connector",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
                     ]
                 },
                 {
@@ -1202,10 +1699,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.page.*._insertion_epoch_timestamp",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.page.*.access_method",
+                    "data_type": "string",
                     "example_values": [
-                        1528210852
+                        "Client"
                     ]
                 },
                 {
@@ -1244,6 +1741,34 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.browser_session_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        6865146192307073553
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.browser_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "104.0.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.bypass_reason",
+                    "data_type": "string",
+                    "example_values": [
+                        "SSL Bypass policy matched"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.bypass_traffic",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.category",
                     "data_type": "string",
                     "example_values": [
@@ -1272,6 +1797,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.conn_duration",
+                    "data_type": "numeric",
+                    "example_values": [
+                        899
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.conn_endtime",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1661909943
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.conn_starttime",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1661909044
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.connection_id",
+                    "data_type": "numeric"
+                },
+                {
                     "data_path": "action_result.data.*.page.*.count",
                     "data_type": "numeric",
                     "example_values": [
@@ -1286,16 +1836,51 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.domain",
+                    "data_type": "string",
+                    "example_values": [
+                        "login.microsoftonline.com"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.dst_country",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.dst_geoip_src",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.dst_latitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        37.9273
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.page.*.dst_location",
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.dst_longitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        -76.8545
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.dst_region",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.dst_timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/New_York"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.page.*.dst_zipcode",
@@ -1312,11 +1897,36 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.dstport",
+                    "data_type": "numeric",
+                    "example_values": [
+                        443
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.hostname",
+                    "data_type": "string",
+                    "example_values": [
+                        "N21-PC"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.http_transaction_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        29
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.id",
                     "data_type": "numeric",
                     "example_values": [
                         7743
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.incident_id",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.data.*.page.*.latency_max",
@@ -1337,6 +1947,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         991
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.netskope_pop",
+                    "data_type": "string",
+                    "example_values": [
+                        "US-SEA1"
                     ]
                 },
                 {
@@ -1368,6 +1985,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.os_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "Windows Server 2012 R2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.page",
+                    "data_type": "string",
+                    "example_values": [
+                        "login.microsoftonline.com"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.page_duration",
                     "data_type": "numeric",
                     "example_values": [
@@ -1396,10 +2027,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.policy",
+                    "data_type": "string",
+                    "example_values": [
+                        "test-policy1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.protocol",
+                    "data_type": "string",
+                    "example_values": [
+                        "HTTP/1.1"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.req_cnt",
                     "data_type": "numeric",
                     "example_values": [
                         5
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.request_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2389429104198680577
                     ]
                 },
                 {
@@ -1410,10 +2062,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.resp_content_len",
+                    "data_type": "numeric",
+                    "example_values": [
+                        137663
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.resp_content_type",
+                    "data_type": "string",
+                    "example_values": [
+                        "text/html"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.server_bytes",
                     "data_type": "numeric",
                     "example_values": [
                         4382
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "unknown"
                     ]
                 },
                 {
@@ -1424,10 +2097,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.slc_latitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12.9762296677
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.slc_longitude",
+                    "data_type": "numeric",
+                    "example_values": [
+                        77.6032867432
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.src_country",
                     "data_type": "string",
                     "example_values": [
                         "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.src_geoip_src",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 },
                 {
@@ -1459,6 +2153,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.src_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tue Aug 30 03:14:00 2022"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.src_timezone",
+                    "data_type": "string",
+                    "example_values": [
+                        "America/Los_Angeles"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.src_zipcode",
                     "data_type": "string",
                     "example_values": [
@@ -1473,6 +2181,27 @@
                     ],
                     "contains": [
                         "ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.ssl_decrypt_policy",
+                    "data_type": "string",
+                    "example_values": [
+                        "yes"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.suppression_end_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1661836783
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.suppression_start_time",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1661836759
                     ]
                 },
                 {
@@ -1497,10 +2226,21 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.transaction_id",
+                    "data_type": "numeric"
+                },
+                {
                     "data_path": "action_result.data.*.page.*.type",
                     "data_type": "string",
                     "example_values": [
                         "page"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.page.*.ur_normalized",
+                    "data_type": "string",
+                    "example_values": [
+                        "labs_12345@protonmail.com"
                     ]
                 },
                 {
@@ -1531,6 +2271,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.page.*.useragent",
+                    "data_type": "string",
+                    "example_values": [
+                        "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.page.*.userip",
                     "data_type": "string",
                     "example_values": [
@@ -1551,21 +2298,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Total page events: 7, Total application events: 61"
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.total_application_events",
                     "data_type": "numeric",
                     "example_values": [
@@ -1577,6 +2309,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         7
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total page events: 7, Total application events: 61"
                     ]
                 },
                 {
@@ -1641,6 +2380,7 @@
             "action": "add url",
             "identifier": "add_url_list",
             "description": "Add an URL to the Netskope URL Blocklist",
+            "verbose": "This action will add URL value to the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update url</b> action is performed.",
             "type": "contain",
             "undo": "remove url",
             "read_only": false,
@@ -1659,6 +2399,16 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "contains": [
@@ -1673,22 +2423,15 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.set_list",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_urls",
@@ -1698,10 +2441,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_files",
-                    "data_type": "numeric",
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "Total urls: 6"
                     ]
                 },
                 {
@@ -1728,6 +2471,7 @@
             "action": "remove url",
             "identifier": "remove_url_list",
             "description": "Remove an URL from the Netskope URL Blocklist",
+            "verbose": "This action will remove URL value from the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update url</b> action is performed.",
             "type": "correct",
             "undo": "add url",
             "read_only": false,
@@ -1746,6 +2490,16 @@
             },
             "output": [
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status",
+                    "column_order": 1,
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.url",
                     "data_type": "string",
                     "contains": [
@@ -1760,22 +2514,15 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string",
-                    "column_name": "Status",
-                    "column_order": 1,
-                    "example_values": [
-                        "success",
-                        "failed"
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.summary.remove_msg",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_files",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_urls",
@@ -1785,10 +2532,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.total_files",
-                    "data_type": "numeric",
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        1
+                        "Remove msg: Removed 1 instances of \"https://www.example.com:80\" from \"test_list_netskope_url_list\", Total urls: 21"
                     ]
                 },
                 {
@@ -1815,14 +2562,11 @@
             "action": "update url",
             "identifier": "update_url_list",
             "description": "Send the url list to Netskope",
+            "verbose": "This action replaces the URL list of a Netskope server with the configured Splunk SOAR custom URL list.",
             "type": "contain",
             "read_only": false,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -1834,7 +2578,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -1842,6 +2586,20 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_urls",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total urls: 2"
                     ]
                 },
                 {
@@ -1868,6 +2626,7 @@
             "action": "add hash",
             "identifier": "add_file_list",
             "description": "Add a file hash to the Netskope file hash list",
+            "verbose": "This action will add file hash value to the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update hash</b> action is performed.",
             "type": "contain",
             "undo": "remove hash",
             "read_only": false,
@@ -1879,26 +2638,13 @@
                     "primary": true,
                     "contains": [
                         "hash",
-                        "md5"
+                        "md5",
+                        "sha256"
                     ],
                     "order": 0
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5"
-                    ],
-                    "column_name": "File",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -1910,7 +2656,18 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha256"
+                    ],
+                    "column_name": "File",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -1929,6 +2686,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total hashes: 2"
                     ]
                 },
                 {
@@ -1955,6 +2719,7 @@
             "action": "remove hash",
             "identifier": "remove_file_list",
             "description": "Remove a hash from the Netskope file hash list",
+            "verbose": "This action will remove file hash value from the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update hash</b> action is performed.",
             "type": "correct",
             "undo": "add hash",
             "read_only": false,
@@ -1966,26 +2731,13 @@
                     "primary": true,
                     "contains": [
                         "hash",
-                        "md5"
+                        "md5",
+                        "sha256"
                     ],
                     "order": 0
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.hash",
-                    "data_type": "string",
-                    "contains": [
-                        "hash",
-                        "md5"
-                    ],
-                    "column_name": "Hash",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -1997,7 +2749,18 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "hash",
+                        "md5",
+                        "sha256"
+                    ],
+                    "column_name": "Hash",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -2012,6 +2775,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total files: 2, Remove msg: Removed 1 instances of \"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\" from \"test_list_netskope_file_list\""
                     ]
                 },
                 {
@@ -2038,14 +2808,11 @@
             "action": "update hash",
             "identifier": "update_file_list",
             "description": "Send the file hash list to Netskope",
+            "verbose": "This action replaces the hash list of a Netskope server with the configured Splunk SOAR custom hash list.",
             "type": "contain",
             "read_only": false,
             "parameters": {},
             "output": [
-                {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
                 {
                     "data_path": "action_result.status",
                     "data_type": "string",
@@ -2057,7 +2824,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
@@ -2065,6 +2832,20 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.total_hashes",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total hashes: 2"
                     ]
                 },
                 {
@@ -2096,7 +2877,7 @@
             },
             {
                 "module": "beautifulsoup4",
-                "input_file": "wheels/beautifulsoup4-4.9.1-py2-none-any.whl"
+                "input_file": "wheels/beautifulsoup4-4.9.1-py3-none-any.whl"
             },
             {
                 "module": "certifi",

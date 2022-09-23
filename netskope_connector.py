@@ -19,6 +19,7 @@ import sys
 import time
 import uuid
 from datetime import datetime
+from urllib.parse import urlparse
 
 import phantom.app as phantom
 import phantom.rules as phantom_rules
@@ -27,7 +28,6 @@ from bs4 import BeautifulSoup
 from phantom import vault
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
-from urllib.parse import urlparse
 
 from netskope_consts import *
 from netskope_utilities import KennyLoggins, logging

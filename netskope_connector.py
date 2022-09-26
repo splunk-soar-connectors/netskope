@@ -1522,7 +1522,7 @@ class NetskopeConnector(BaseConnector):
                                         'Error: A URL List object with the name provided does not \
                                             exist on the Netskope. Create one first.'), None
 
-    def _handle_scim_get_groups(self, param):
+    def _handle_get_scim_groups(self, param):
         """Get SCIM groups.
 
         :param param: Dictionary of input parameters
@@ -1554,7 +1554,7 @@ class NetskopeConnector(BaseConnector):
             self._log.error('exception_line={0} Get SCIM Users: {1}'.format(exc_tb.tb_lineno, error_msg))
             return action_result.set_status(phantom.APP_ERROR, 'Exception {0}: line={1}'.format(error_msg, exc_tb.tb_lineno))
 
-    def _handle_scim_get_users(self, param):
+    def _handle_get_scim_users(self, param):
         """Get SCIM users.
 
         :param param: Dictionary of input parameters
@@ -1625,7 +1625,7 @@ class NetskopeConnector(BaseConnector):
             self._log.error('exception_line={0} Add User to Group SCIM: {1}'.format(exc_tb.tb_lineno, error_msg))
             return action_result.set_status(phantom.APP_ERROR, 'Exception {0}: line={1}'.format(error_msg, exc_tb.tb_lineno))
 
-    def _handle_scim_create_group(self, param):
+    def _handle_create_scim_group(self, param):
         """Create SCIM group.
 
         :param param: Dictionary of input parameters
@@ -1655,7 +1655,7 @@ class NetskopeConnector(BaseConnector):
             self._log.error(('exception_line={0} Add User to Group SCIM: {1}').format(exc_tb.tb_lineno, error_msg))
             return action_result.set_status(phantom.APP_ERROR, ('Exception {0}: line={1}').format(error_msg, exc_tb.tb_lineno))
 
-    def _handle_scim_create_user(self, param):
+    def _handle_create_scim_user(self, param):
         """Create SCIM user.
 
         :param param: Dictionary of input parameters
@@ -1827,10 +1827,10 @@ class NetskopeConnector(BaseConnector):
             'add_file_list': self._handle_add_file_list,
             'remove_file_list': self._handle_remove_file_list,
             'update_file_list': self._handle_update_file_list,
-            'get_scim_users': self._handle_scim_get_users,
-            'get_scim_groups': self._handle_scim_get_groups,
-            'create_scim_group': self._handle_scim_create_group,
-            'create_scim_user': self._handle_scim_create_user,
+            'get_scim_users': self._handle_get_scim_users,
+            'get_scim_groups': self._handle_get_scim_groups,
+            'create_scim_group': self._handle_create_scim_group,
+            'create_scim_user': self._handle_create_scim_user,
             'scim_user_to_group': self._handle_scim_user_to_group
         }
 

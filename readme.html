@@ -90,47 +90,66 @@
           <div class="body" role="main">
 
   <div class="section" id="usage-notes">
-<h1>Usage notes<a class="headerlink" href="#usage-notes" title="Permalink to this headline">¶</a></h1>
+<h1>Usage notes</h1>
 <div class="toctree-wrapper compound">
 </div>
 <div class="section" id="action-notes">
-<h2>Action Notes<a class="headerlink" href="#action-notes" title="Permalink to this headline">¶</a></h2>
-<p>Notes on Actions.</p>
+<h2>Action Notes</h2>
+<p>
+  <ul>
+    <li>
+      Below actions will use V2 REST API <a href="https://docs.netskope.com/en/rest-api-v2-overview-312207.html" target="_blank">endpoints
+      </a> if <b>V2 API Key</b> is configured in the asset. Actions will continue to support V1 API Key if V2 API Key is not provided, but it is recommended to use V2 API Key.
+      <ul>
+        <li>run query</li>
+        <li>update url</li>
+        <li>on poll</li>
+      </ul>
+    </li>
+    <li>
+      Test Connectivity will behave as described below:
+      <ul>
+        <li>If V1 API Key is configured, then the connectivity will be checked for V1 API Key</li>
+        <li>If V2 API Key is configured, then the connectivity will be checked for V2 API Key</li>
+        <li>If both are configured then the connectivity will be checked with both API Keys</li>
+        <li>If none is provided then the message will be thrown to configure at least one</li>
+      </ul>
+    </li>
+    <li>
+      Below actions will continue to use V1 API endpoints so without configuring <b>V1 API Key</b> below actions will fail.
+      <ul>
+        <li>update hash</li>
+        <li>list files</li>
+        <li>get file</li>
+      </ul>
+    </li>
+    <li>
+      Actions listed below just update the Splunk SOAR list and do not make any REST calls to the Netskope, so they'll work without any API Key.
+      <ul>
+        <li>add url</li>
+        <li>remove url</li>
+        <li>add hash</li>
+        <li>remove hash</li>
+      </ul>
+    </li>
+    <li>
+      V2 REST API token must have access to the below mentioned endpoints to run all the V2 supported actions properly.
+      <ul>
+        <li>/api/v2/events/data/page (Read)</li>
+        <li>/api/v2/events/data/alert (Read)</li>
+        <li>/api/v2/events/data/application (Read)</li>
+        <li>/api/v2/policy/urllist (Read + Write)</li>
+        <li>/api/v2/policy/urllist/deploy (Read + Write)</li>
+      </ul>
+    </li>
+    <li>In Splunk SOAR, a configured file list will be created with <b>{list_name}_file_list</b> format and a url list will be created with <b>{list_name}_url_list</b>. Where, list_name is a configured asset parameter.</li>
+    <li>In order to reflect the URL/file_hash values to the Netskope, the same profile must exist at the Netskope. i.e., if test_list is provided as a list_name in the asset configuration, the same name of the profile should exist on the Netskope server.</li>
+  </ul>
+</p>
 </div>
 <div class="section" id="support">
-<h2>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h2>
+<h2>Support</h2>
 <p>Please contact Netskope Support for any issues relating to this app.</p>
 </div>
-<div class="section" id="release-notes">
-<h2>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="v1-0-5">
-<h3>v1.0.5<a class="headerlink" href="#v1-0-5" title="Permalink to this headline">¶</a></h3>
-</div>
-</div>
-</div>
-
-
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-</div>
-        </div>
-      </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2022
-
-      |
-      Powered by <a href="http://sphinx-doc.org/" target="_blank">Sphinx 1.6.2</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster" target="_blank">Alabaster 0.7.10</a>
-
-    </div>
-
-
-
-
   </body>
 </html>

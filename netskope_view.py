@@ -16,7 +16,7 @@ from datetime import datetime
 
 
 def get_ctx_result(provides, result):
-    """ Function that parses data.
+    """Parse the data.
 
     :param result: result
     :param provides: action name
@@ -38,7 +38,7 @@ def get_ctx_result(provides, result):
 
 
 def _parse_data(data):
-    """ Function that parse data.
+    """Parse the data.
 
     :param data: response data
     :return: response data
@@ -46,16 +46,14 @@ def _parse_data(data):
     for pages in data.get('page', []):
         try:
             if pages.get('_insertion_epoch_timestamp'):
-                pages['_insertion_epoch_timestamp'] = ('{}Z').format(
-                        datetime.fromtimestamp(pages['_insertion_epoch_timestamp']).isoformat())
+                pages['_insertion_epoch_timestamp'] = ('{}Z').format(datetime.fromtimestamp(pages['_insertion_epoch_timestamp']).isoformat())
         except ValueError:
             pass
 
     for app in data.get('application', []):
         try:
             if app.get('_insertion_epoch_timestamp'):
-                app['_insertion_epoch_timestamp'] = ('{}Z').format(
-                        datetime.fromtimestamp(app['_insertion_epoch_timestamp']).isoformat())
+                app['_insertion_epoch_timestamp'] = ('{}Z').format(datetime.fromtimestamp(app['_insertion_epoch_timestamp']).isoformat())
         except ValueError:
             pass
 
@@ -63,7 +61,7 @@ def _parse_data(data):
 
 
 def display_view(provides, all_app_runs, context):
-    """ Function that displays view.
+    """Display view.
 
     :param provides: action name
     :param context: context

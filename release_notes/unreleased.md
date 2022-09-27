@@ -1,1 +1,6 @@
 **Unreleased**
+* Compatibility changes for Python 3 support
+* Added support of v2 REST API endpoints for below actions:
+    - run query
+    - update url
+    - on poll

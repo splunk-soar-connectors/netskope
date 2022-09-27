@@ -80,7 +80,7 @@ class NetskopeConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as ex:
-            self.error_print('Error occurred while retrieving exception information, Details: {}'.format(str(ex)))
+            self._dump_error_log(ex, 'Error occurred while retrieving exception information')
 
         return 'Error Code: {0}. Error Message: {1}'.format(error_code, error_msg)
 

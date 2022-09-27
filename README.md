@@ -2,11 +2,11 @@
 # Netskope
 
 Publisher: Netskope  
-Connector Version: 2\.3\.1  
+Connector Version: 3\.0\.0  
 Product Vendor: Netskope  
 Product Name: Netskope  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.2\.0  
+Minimum Product Version: 5\.3\.3  
 
 This app integrates with the Netskope to execute various investigative and polling actions
 
@@ -57,7 +57,7 @@ ports used by the Splunk SOAR Connector.
 
 <div id="usage-notes" class="section">
 
-# Usage notes <a href="#usage-notes" class="headerlink" title="Permalink to this headline">¶</a>
+# Usage notes
 
 <div class="toctree-wrapper compound">
 
@@ -65,28 +65,55 @@ ports used by the Splunk SOAR Connector.
 
 <div id="action-notes" class="section">
 
-## Action Notes <a href="#action-notes" class="headerlink" title="Permalink to this headline">¶</a>
+## Action Notes
 
-Notes on Actions.
+-   Below actions will use V2 REST API
+    [endpoints](https://docs.netskope.com/en/rest-api-v2-overview-312207.html) if **V2 API Key** is
+    configured in the asset. Actions will continue to support V1 API Key if V2 API Key is not
+    provided, but it is recommended to use V2 API Key.
+    -   run query
+    -   update url
+    -   on poll
+-   Test Connectivity will behave as described below:
+    -   If V1 API Key is configured, then the connectivity will be checked for V1 API Key
+    -   If V2 API Key is configured, then the connectivity will be checked for V2 API Key
+    -   If both are configured then the connectivity will be checked with both API Keys
+    -   If none is provided then the message will be thrown to configure at least one
+-   Below actions will continue to use V1 API endpoints so without configuring **V1 API Key** below
+    actions will fail.
+    -   update hash
+    -   list files
+    -   get file
+-   Actions listed below just update the Splunk SOAR list and do not make any REST calls to the
+    Netskope, so they'll work without any API Key.
+    -   add url
+    -   remove url
+    -   add hash
+    -   remove hash
+-   V2 REST API token must have access to the below mentioned endpoints to run all the V2 supported
+    actions properly.
+    -   /api/v2/events/data/page (Read)
+    -   /api/v2/events/data/alert (Read)
+    -   /api/v2/events/data/application (Read)
+    -   /api/v2/policy/urllist (Read + Write)
+    -   /api/v2/policy/urllist/deploy (Read + Write)
+-   In Splunk SOAR, a configured file list will be created with **{list_name}\_file_list** format
+    and a url list will be created with **{list_name}\_url_list** . Where, list_name is a configured
+    asset parameter.
+-   In order to reflect the URL/file_hash values to the Netskope, the same profile must exist at the
+    Netskope. i.e., if test_list is provided as a list_name in the asset configuration, the same
+    name of the profile should exist on the Netskope server.
 
 </div>
 
 <div id="support" class="section">
 
-## Support <a href="#support" class="headerlink" title="Permalink to this headline">¶</a>
+## Support
 
 Please contact Netskope Support for any issues relating to this app.
 
 </div>
 
-<div id="release-notes" class="section">
-
-## Release Notes <a href="#release-notes" class="headerlink" title="Permalink to this headline">¶</a>
-
-<div id="v1-0-5" class="section">
-
-### v1.0.5 <a href="#release-notes" class="headerlink" title="Permalink to this headline">¶</a>
-
 </div>
 
 </div>
@@ -94,33 +121,6 @@ Please contact Netskope Support for any issues relating to this app.
 </div>
 
 </div>
-
-</div>
-
-</div>
-
-<div class="sphinxsidebar" aria-label="main navigation" role="navigation">
-
-<div class="sphinxsidebarwrapper">
-
-<div class="relations">
-
-</div>
-
-</div>
-
-</div>
-
-<div class="clearer">
-
-</div>
-
-</div>
-
-<div class="footer">
-
-©2022 \| Powered by [Sphinx 1.6.2](http://sphinx-doc.org/) & [Alabaster
-0.7.10](https://github.com/bitprophet/alabaster)
 
 </div>
 
@@ -131,10 +131,11 @@ The below configuration variables are required for this Connector to operate.  T
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
 **server\_url** |  required  | string | Server URL
-**api\_key** |  required  | password | API Key
+**v2\_api\_key** |  optional  | password | V2 API Key \(recommended\)
 **scim\_url** |  optional  | string | SCIM Server URL
 **scim\_key** |  optional  | password | SCIM Token
-**list\_name** |  optional  | string | Netskope List Name \(both Url and File Hash\)
+**list\_name** |  optional  | string | Netskope List Name \(both URL and file hash\)
+**api\_key** |  optional  | password | V1 API Key
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
@@ -181,13 +182,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.file | string |  `netskope file id`  `file name` 
 action\_result\.parameter\.profile | string |  `netskope profile id`  `netskope profile name` 
 action\_result\.data\.\*\.file\_name | string |  `file name` 
 action\_result\.data\.\*\.vault\_id | string |  `vault id` 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.vault\_id | string |  `vault id` 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -205,14 +206,19 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.user | string |  `netskope user`  `email`  `user name` 
 action\_result\.data\.\*\.active | boolean | 
+action\_result\.data\.\*\.emails\.\*\.primary | boolean | 
+action\_result\.data\.\*\.emails\.\*\.type | string | 
+action\_result\.data\.\*\.emails\.\*\.value | string | 
 action\_result\.data\.\*\.externalId | string |  `netskope external id` 
 action\_result\.data\.\*\.id | string |  `netskope scim user id` 
+action\_result\.data\.\*\.name\.familyName | string | 
+action\_result\.data\.\*\.name\.givenName | string | 
 action\_result\.data\.\*\.userName | string |  `netskope user`  `user name`  `email` 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.total\_users | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -230,13 +236,14 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.group | string |  `netskope group name` 
 action\_result\.data\.\*\.displayName | string |  `netskope group name` 
 action\_result\.data\.\*\.externalId | string |  `netskope external id` 
 action\_result\.data\.\*\.id | string |  `netskope scim group id` 
-action\_result\.status | string | 
-action\_result\.message | string | 
+action\_result\.data\.\*\.meta\.resourceType | string | 
 action\_result\.summary\.total\_groups | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -254,12 +261,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.group | string |  `netskope group name` 
 action\_result\.data\.\*\.displayName | string | 
 action\_result\.data\.\*\.id | string |  `netskope scim group id` 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.total\_groups | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -280,15 +287,22 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.email | string |  `netskope user`  `email` 
 action\_result\.parameter\.familyName | string | 
 action\_result\.parameter\.givenName | string | 
 action\_result\.parameter\.user | string |  `netskope user` 
+action\_result\.data\.\*\.active | boolean | 
+action\_result\.data\.\*\.emails\.\*\.primary | boolean | 
+action\_result\.data\.\*\.emails\.\*\.value | string | 
 action\_result\.data\.\*\.id | string |  `netskope scim user id` 
+action\_result\.data\.\*\.mail | string | 
+action\_result\.data\.\*\.name\.familyName | string | 
+action\_result\.data\.\*\.name\.givenName | string | 
+action\_result\.data\.\*\.status | numeric | 
 action\_result\.data\.\*\.userName | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.total\_users | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -308,13 +322,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.action | string | 
 action\_result\.parameter\.group | string |  `netskope scim group id` 
 action\_result\.parameter\.user | string |  `netskope scim user id` 
 action\_result\.data\.\*\.displayName | string |  `netskope group name` 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.total\_users | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -330,6 +344,7 @@ No parameters are required for this action
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.data\.\*\.file\_id | string |  `netskope file id` 
 action\_result\.data\.\*\.original\_file\_name | string |  `file name` 
 action\_result\.data\.\*\.policy | string | 
@@ -337,9 +352,8 @@ action\_result\.data\.\*\.quarantine\_profile\_id | string |  `netskope profile 
 action\_result\.data\.\*\.quarantine\_profile\_name | string |  `netskope profile name` 
 action\_result\.data\.\*\.quarantined\_file\_name | string |  `file name` 
 action\_result\.data\.\*\.user\_id | string |  `email` 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.total\_files | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -349,7 +363,7 @@ Run query for events on a given IP
 Type: **investigate**  
 Read only: **True**
 
-<ul><li>If no &quotstart\_time&quot and &quotend\_time&quot is provided, the action will take the last 24 hours as the time period\.<li>If only &quotstart\_time&quot is provided, current time would be taken as &quotend\_time&quot\.<li>If only &quotend\_time&quot is provided, 24 hours prior to &quotend\_time&quot would be taken as &quotstart\_time&quot\.</ul>
+<ul><li>If no &quotstart\_time&quot and &quotend\_time&quot is provided, the action will take the last 24 hours as the time period\.<li>If only &quotstart\_time&quot is provided, current time would be taken as &quotend\_time&quot\.<li>If only &quotend\_time&quot is provided, 24 hours prior to &quotend\_time&quot would be taken as &quotstart\_time&quot\.<li>The action only returns page and application events for the given IP\.</ul>
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -361,108 +375,198 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.end\_time | numeric | 
 action\_result\.parameter\.ip | string |  `ip` 
 action\_result\.parameter\.start\_time | numeric | 
 action\_result\.data\.\*\.application\.\*\.\_id | string | 
-action\_result\.data\.\*\.application\.\*\.\_insertion\_epoch\_timestamp | numeric | 
+action\_result\.data\.\*\.application\.\*\.access\_method | string | 
+action\_result\.data\.\*\.application\.\*\.act\_user | string | 
+action\_result\.data\.\*\.application\.\*\.action | string | 
 action\_result\.data\.\*\.application\.\*\.activity | string | 
 action\_result\.data\.\*\.application\.\*\.alert | string | 
 action\_result\.data\.\*\.application\.\*\.app | string | 
+action\_result\.data\.\*\.application\.\*\.app\_activity | string | 
 action\_result\.data\.\*\.application\.\*\.app\_session\_id | numeric | 
 action\_result\.data\.\*\.application\.\*\.appcategory | string | 
+action\_result\.data\.\*\.application\.\*\.appsuite | string | 
 action\_result\.data\.\*\.application\.\*\.browser | string | 
+action\_result\.data\.\*\.application\.\*\.browser\_session\_id | numeric | 
+action\_result\.data\.\*\.application\.\*\.browser\_version | string | 
 action\_result\.data\.\*\.application\.\*\.category | string | 
 action\_result\.data\.\*\.application\.\*\.cci | numeric | 
 action\_result\.data\.\*\.application\.\*\.ccl | string | 
+action\_result\.data\.\*\.application\.\*\.connection\_id | numeric | 
 action\_result\.data\.\*\.application\.\*\.count | numeric | 
+action\_result\.data\.\*\.application\.\*\.data\_type | string | 
 action\_result\.data\.\*\.application\.\*\.device | string | 
+action\_result\.data\.\*\.application\.\*\.device\_classification | string | 
 action\_result\.data\.\*\.application\.\*\.dst\_country | string | 
+action\_result\.data\.\*\.application\.\*\.dst\_geoip\_src | numeric | 
+action\_result\.data\.\*\.application\.\*\.dst\_latitude | numeric | 
 action\_result\.data\.\*\.application\.\*\.dst\_location | string | 
+action\_result\.data\.\*\.application\.\*\.dst\_longitude | numeric | 
 action\_result\.data\.\*\.application\.\*\.dst\_region | string | 
+action\_result\.data\.\*\.application\.\*\.dst\_timezone | string | 
 action\_result\.data\.\*\.application\.\*\.dst\_zipcode | string | 
 action\_result\.data\.\*\.application\.\*\.dstip | string |  `ip` 
+action\_result\.data\.\*\.application\.\*\.encrypt\_failure | string | 
+action\_result\.data\.\*\.application\.\*\.file\_category | string | 
+action\_result\.data\.\*\.application\.\*\.file\_size | numeric | 
+action\_result\.data\.\*\.application\.\*\.file\_type | string | 
 action\_result\.data\.\*\.application\.\*\.from\_object | string | 
+action\_result\.data\.\*\.application\.\*\.from\_storage | string | 
 action\_result\.data\.\*\.application\.\*\.from\_user | string |  `email` 
+action\_result\.data\.\*\.application\.\*\.hostname | string | 
 action\_result\.data\.\*\.application\.\*\.id | numeric | 
+action\_result\.data\.\*\.application\.\*\.incident\_id | numeric | 
+action\_result\.data\.\*\.application\.\*\.instance\_id | string | 
+action\_result\.data\.\*\.application\.\*\.managed\_app | string | 
+action\_result\.data\.\*\.application\.\*\.managementID | string | 
+action\_result\.data\.\*\.application\.\*\.md5 | string | 
+action\_result\.data\.\*\.application\.\*\.netskope\_activity | string | 
+action\_result\.data\.\*\.application\.\*\.netskope\_pop | string | 
+action\_result\.data\.\*\.application\.\*\.nsdeviceuid | string | 
 action\_result\.data\.\*\.application\.\*\.object | string | 
+action\_result\.data\.\*\.application\.\*\.object\_id | string | 
 action\_result\.data\.\*\.application\.\*\.object\_type | string | 
 action\_result\.data\.\*\.application\.\*\.org | string |  `domain` 
 action\_result\.data\.\*\.application\.\*\.organization\_unit | string | 
 action\_result\.data\.\*\.application\.\*\.os | string | 
+action\_result\.data\.\*\.application\.\*\.os\_version | string | 
+action\_result\.data\.\*\.application\.\*\.page | string | 
 action\_result\.data\.\*\.application\.\*\.page\_id | numeric | 
+action\_result\.data\.\*\.application\.\*\.page\_site | string | 
 action\_result\.data\.\*\.application\.\*\.policy | string | 
+action\_result\.data\.\*\.application\.\*\.policy\_id | string | 
+action\_result\.data\.\*\.application\.\*\.protocol | string | 
+action\_result\.data\.\*\.application\.\*\.referer | string | 
+action\_result\.data\.\*\.application\.\*\.request\_id | numeric | 
+action\_result\.data\.\*\.application\.\*\.sanctioned\_instance | string | 
+action\_result\.data\.\*\.application\.\*\.severity | string | 
 action\_result\.data\.\*\.application\.\*\.site | string | 
 action\_result\.data\.\*\.application\.\*\.src\_country | string | 
+action\_result\.data\.\*\.application\.\*\.src\_geoip\_src | numeric | 
 action\_result\.data\.\*\.application\.\*\.src\_latitude | numeric | 
 action\_result\.data\.\*\.application\.\*\.src\_location | string | 
 action\_result\.data\.\*\.application\.\*\.src\_longitude | numeric | 
 action\_result\.data\.\*\.application\.\*\.src\_region | string | 
+action\_result\.data\.\*\.application\.\*\.src\_time | string | 
+action\_result\.data\.\*\.application\.\*\.src\_timezone | string | 
 action\_result\.data\.\*\.application\.\*\.src\_zipcode | string | 
 action\_result\.data\.\*\.application\.\*\.srcip | string |  `ip` 
+action\_result\.data\.\*\.application\.\*\.suppression\_end\_time | numeric | 
+action\_result\.data\.\*\.application\.\*\.suppression\_start\_time | numeric | 
 action\_result\.data\.\*\.application\.\*\.sv | string | 
+action\_result\.data\.\*\.application\.\*\.telemetry\_app | string | 
 action\_result\.data\.\*\.application\.\*\.timestamp | numeric | 
 action\_result\.data\.\*\.application\.\*\.to\_user | string |  `email` 
 action\_result\.data\.\*\.application\.\*\.traffic\_type | string | 
+action\_result\.data\.\*\.application\.\*\.transaction\_id | numeric | 
+action\_result\.data\.\*\.application\.\*\.tss\_mode | string | 
 action\_result\.data\.\*\.application\.\*\.type | string | 
+action\_result\.data\.\*\.application\.\*\.universal\_connector | string | 
+action\_result\.data\.\*\.application\.\*\.ur\_normalized | string | 
 action\_result\.data\.\*\.application\.\*\.url | string |  `url` 
 action\_result\.data\.\*\.application\.\*\.user | string |  `email` 
+action\_result\.data\.\*\.application\.\*\.user\_category | string | 
+action\_result\.data\.\*\.application\.\*\.user\_id | string | 
+action\_result\.data\.\*\.application\.\*\.user\_name | string | 
+action\_result\.data\.\*\.application\.\*\.user\_role | string | 
+action\_result\.data\.\*\.application\.\*\.useragent | string | 
 action\_result\.data\.\*\.application\.\*\.userip | string |  `ip` 
 action\_result\.data\.\*\.application\.\*\.userkey | string |  `email` 
+action\_result\.data\.\*\.application\.\*\.web\_universal\_connector | string | 
 action\_result\.data\.\*\.page\.\*\.\_id | string | 
-action\_result\.data\.\*\.page\.\*\.\_insertion\_epoch\_timestamp | numeric | 
+action\_result\.data\.\*\.page\.\*\.access\_method | string | 
 action\_result\.data\.\*\.page\.\*\.app | string | 
 action\_result\.data\.\*\.page\.\*\.app\_action\_cnt | numeric | 
 action\_result\.data\.\*\.page\.\*\.app\_session\_id | numeric | 
 action\_result\.data\.\*\.page\.\*\.appcategory | string | 
 action\_result\.data\.\*\.page\.\*\.browser | string | 
+action\_result\.data\.\*\.page\.\*\.browser\_session\_id | numeric | 
+action\_result\.data\.\*\.page\.\*\.browser\_version | string | 
+action\_result\.data\.\*\.page\.\*\.bypass\_reason | string | 
+action\_result\.data\.\*\.page\.\*\.bypass\_traffic | string | 
 action\_result\.data\.\*\.page\.\*\.category | string | 
 action\_result\.data\.\*\.page\.\*\.cci | numeric | 
 action\_result\.data\.\*\.page\.\*\.ccl | string | 
 action\_result\.data\.\*\.page\.\*\.client\_bytes | numeric | 
+action\_result\.data\.\*\.page\.\*\.conn\_duration | numeric | 
+action\_result\.data\.\*\.page\.\*\.conn\_endtime | numeric | 
+action\_result\.data\.\*\.page\.\*\.conn\_starttime | numeric | 
+action\_result\.data\.\*\.page\.\*\.connection\_id | numeric | 
 action\_result\.data\.\*\.page\.\*\.count | numeric | 
 action\_result\.data\.\*\.page\.\*\.device | string | 
+action\_result\.data\.\*\.page\.\*\.domain | string | 
 action\_result\.data\.\*\.page\.\*\.dst\_country | string | 
+action\_result\.data\.\*\.page\.\*\.dst\_geoip\_src | numeric | 
+action\_result\.data\.\*\.page\.\*\.dst\_latitude | numeric | 
 action\_result\.data\.\*\.page\.\*\.dst\_location | string | 
+action\_result\.data\.\*\.page\.\*\.dst\_longitude | numeric | 
 action\_result\.data\.\*\.page\.\*\.dst\_region | string | 
+action\_result\.data\.\*\.page\.\*\.dst\_timezone | string | 
 action\_result\.data\.\*\.page\.\*\.dst\_zipcode | string | 
 action\_result\.data\.\*\.page\.\*\.dstip | string |  `ip` 
+action\_result\.data\.\*\.page\.\*\.dstport | numeric | 
+action\_result\.data\.\*\.page\.\*\.hostname | string | 
+action\_result\.data\.\*\.page\.\*\.http\_transaction\_count | numeric | 
 action\_result\.data\.\*\.page\.\*\.id | numeric | 
+action\_result\.data\.\*\.page\.\*\.incident\_id | numeric | 
 action\_result\.data\.\*\.page\.\*\.latency\_max | numeric | 
 action\_result\.data\.\*\.page\.\*\.latency\_min | numeric | 
 action\_result\.data\.\*\.page\.\*\.latency\_total | numeric | 
+action\_result\.data\.\*\.page\.\*\.netskope\_pop | string | 
 action\_result\.data\.\*\.page\.\*\.numbytes | numeric | 
 action\_result\.data\.\*\.page\.\*\.org | string |  `domain` 
 action\_result\.data\.\*\.page\.\*\.organization\_unit | string | 
 action\_result\.data\.\*\.page\.\*\.os | string | 
+action\_result\.data\.\*\.page\.\*\.os\_version | string | 
+action\_result\.data\.\*\.page\.\*\.page | string | 
 action\_result\.data\.\*\.page\.\*\.page\_duration | numeric | 
 action\_result\.data\.\*\.page\.\*\.page\_endtime | numeric | 
 action\_result\.data\.\*\.page\.\*\.page\_id | numeric | 
 action\_result\.data\.\*\.page\.\*\.page\_starttime | numeric | 
+action\_result\.data\.\*\.page\.\*\.policy | string | 
+action\_result\.data\.\*\.page\.\*\.protocol | string | 
 action\_result\.data\.\*\.page\.\*\.req\_cnt | numeric | 
+action\_result\.data\.\*\.page\.\*\.request\_id | numeric | 
 action\_result\.data\.\*\.page\.\*\.resp\_cnt | numeric | 
+action\_result\.data\.\*\.page\.\*\.resp\_content\_len | numeric | 
+action\_result\.data\.\*\.page\.\*\.resp\_content\_type | string | 
 action\_result\.data\.\*\.page\.\*\.server\_bytes | numeric | 
+action\_result\.data\.\*\.page\.\*\.severity | string | 
 action\_result\.data\.\*\.page\.\*\.site | string | 
+action\_result\.data\.\*\.page\.\*\.slc\_latitude | numeric | 
+action\_result\.data\.\*\.page\.\*\.slc\_longitude | numeric | 
 action\_result\.data\.\*\.page\.\*\.src\_country | string | 
+action\_result\.data\.\*\.page\.\*\.src\_geoip\_src | numeric | 
 action\_result\.data\.\*\.page\.\*\.src\_latitude | numeric | 
 action\_result\.data\.\*\.page\.\*\.src\_location | string | 
 action\_result\.data\.\*\.page\.\*\.src\_longitude | numeric | 
 action\_result\.data\.\*\.page\.\*\.src\_region | string | 
+action\_result\.data\.\*\.page\.\*\.src\_time | string | 
+action\_result\.data\.\*\.page\.\*\.src\_timezone | string | 
 action\_result\.data\.\*\.page\.\*\.src\_zipcode | string | 
 action\_result\.data\.\*\.page\.\*\.srcip | string |  `ip` 
+action\_result\.data\.\*\.page\.\*\.ssl\_decrypt\_policy | string | 
+action\_result\.data\.\*\.page\.\*\.suppression\_end\_time | numeric | 
+action\_result\.data\.\*\.page\.\*\.suppression\_start\_time | numeric | 
 action\_result\.data\.\*\.page\.\*\.sv | string | 
 action\_result\.data\.\*\.page\.\*\.timestamp | numeric | 
 action\_result\.data\.\*\.page\.\*\.traffic\_type | string | 
+action\_result\.data\.\*\.page\.\*\.transaction\_id | numeric | 
 action\_result\.data\.\*\.page\.\*\.type | string | 
+action\_result\.data\.\*\.page\.\*\.ur\_normalized | string | 
 action\_result\.data\.\*\.page\.\*\.url | string |  `url` 
 action\_result\.data\.\*\.page\.\*\.user | string |  `email` 
 action\_result\.data\.\*\.page\.\*\.user\_generated | string | 
+action\_result\.data\.\*\.page\.\*\.useragent | string | 
 action\_result\.data\.\*\.page\.\*\.userip | string |  `ip` 
 action\_result\.data\.\*\.page\.\*\.userkey | string |  `email` 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.total\_application\_events | numeric | 
 action\_result\.summary\.total\_page\_events | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -492,6 +596,8 @@ Add an URL to the Netskope URL Blocklist
 Type: **contain**  
 Read only: **False**
 
+This action will add URL value to the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update url</b> action is performed\.
+
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
@@ -500,13 +606,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.url | string |  `url`  `domain` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.set\_list | string | 
-action\_result\.summary\.total\_urls | numeric | 
 action\_result\.summary\.total\_files | numeric | 
+action\_result\.summary\.total\_urls | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -516,6 +622,8 @@ Remove an URL from the Netskope URL Blocklist
 Type: **correct**  
 Read only: **False**
 
+This action will remove URL value from the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update url</b> action is performed\.
+
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
@@ -524,13 +632,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
+action\_result\.status | string | 
 action\_result\.parameter\.url | string |  `url`  `domain` 
 action\_result\.data | string | 
-action\_result\.status | string | 
-action\_result\.message | string | 
 action\_result\.summary\.remove\_msg | string | 
-action\_result\.summary\.total\_urls | numeric | 
 action\_result\.summary\.total\_files | numeric | 
+action\_result\.summary\.total\_urls | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -540,16 +648,19 @@ Send the url list to Netskope
 Type: **contain**  
 Read only: **False**
 
+This action replaces the URL list of a Netskope server with the configured Splunk SOAR custom URL list\.
+
 #### Action Parameters
 No parameters are required for this action
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.data | string | 
 action\_result\.status | string | 
-action\_result\.message | string | 
+action\_result\.data | string | 
 action\_result\.summary\.total\_files | numeric | 
+action\_result\.summary\.total\_urls | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -559,21 +670,23 @@ Add a file hash to the Netskope file hash list
 Type: **contain**  
 Read only: **False**
 
+This action will add file hash value to the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update hash</b> action is performed\.
+
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**hash** |  required  | Hash to add | string |  `hash`  `md5` 
+**hash** |  required  | Hash to add | string |  `hash`  `md5`  `sha256` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.parameter\.hash | string |  `hash`  `md5` 
-action\_result\.data | string | 
 action\_result\.status | string | 
-action\_result\.message | string | 
+action\_result\.parameter\.hash | string |  `hash`  `md5`  `sha256` 
+action\_result\.data | string | 
 action\_result\.summary\.set\_list | string | 
 action\_result\.summary\.total\_files | numeric | 
 action\_result\.summary\.total\_hashes | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -583,20 +696,22 @@ Remove a hash from the Netskope file hash list
 Type: **correct**  
 Read only: **False**
 
+This action will remove file hash value from the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update hash</b> action is performed\.
+
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**hash** |  required  | Hash to remove | string |  `hash`  `md5` 
+**hash** |  required  | Hash to remove | string |  `hash`  `md5`  `sha256` 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.parameter\.hash | string |  `hash`  `md5` 
-action\_result\.data | string | 
 action\_result\.status | string | 
-action\_result\.message | string | 
+action\_result\.parameter\.hash | string |  `hash`  `md5`  `sha256` 
+action\_result\.data | string | 
 action\_result\.summary\.remove\_msg | string | 
 action\_result\.summary\.total\_files | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric |   
 
@@ -606,15 +721,18 @@ Send the file hash list to Netskope
 Type: **contain**  
 Read only: **False**
 
+This action replaces the hash list of a Netskope server with the configured Splunk SOAR custom hash list\.
+
 #### Action Parameters
 No parameters are required for this action
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.data | string | 
 action\_result\.status | string | 
-action\_result\.message | string | 
+action\_result\.data | string | 
 action\_result\.summary\.total\_files | numeric | 
+action\_result\.summary\.total\_hashes | numeric | 
+action\_result\.message | string | 
 summary\.total\_objects | numeric | 
 summary\.total\_objects\_successful | numeric | 

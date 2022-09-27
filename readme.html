@@ -98,8 +98,8 @@
 <p>
   <ul>
     <li>
-      Below actions will use v2 REST API <a href="https://docs.netskope.com/en/rest-api-v2-overview-312207.html" target="_blank">endpoints
-      </a> if <b>v2 API Key</b> is configured in the asset. Actions will continue to support v1 API Key if v2 API Key is not provided, but it is recommended to use v2 API Key.
+      Below actions will use V2 REST API <a href="https://docs.netskope.com/en/rest-api-v2-overview-312207.html" target="_blank">endpoints
+      </a> if <b>V2 API Key</b> is configured in the asset. Actions will continue to support V1 API Key if V2 API Key is not provided, but it is recommended to use V2 API Key.
       <ul>
         <li>run query</li>
         <li>update url</li>
@@ -109,14 +109,14 @@
     <li>
       Test Connectivity will behave as described below:
       <ul>
-        <li>If v1 API Key is configured, then the connectivity will be checked for v1 API Key</li>
-        <li>If v2 API Key is configured, then the connectivity will be checked for v2 API Key</li>
+        <li>If V1 API Key is configured, then the connectivity will be checked for V1 API Key</li>
+        <li>If V2 API Key is configured, then the connectivity will be checked for V2 API Key</li>
         <li>If both are configured then the connectivity will be checked with both API Keys</li>
         <li>If none is provided then the message will be thrown to configure at least one</li>
       </ul>
     </li>
     <li>
-      Below actions will continue to use v1 API endpoints so without configuring <b>v1 API Key</b> below actions will fail.
+      Below actions will continue to use V1 API endpoints so without configuring <b>V1 API Key</b> below actions will fail.
       <ul>
         <li>update hash</li>
         <li>list files</li>
@@ -133,7 +133,7 @@
       </ul>
     </li>
     <li>
-      v2 REST API token must have access to the below mentioned endpoints to run all the v2 supported actions properly.
+      V2 REST API token must have access to the below mentioned endpoints to run all the V2 supported actions properly.
       <ul>
         <li>/api/v2/events/data/page (Read)</li>
         <li>/api/v2/events/data/alert (Read)</li>

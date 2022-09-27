@@ -29,7 +29,7 @@
             "order": 0
         },
         "v2_api_key": {
-            "description": "V2 API KEY (recommended)",
+            "description": "V2 API Key (recommended)",
             "data_type": "password",
             "order": 1
         },
@@ -50,7 +50,7 @@
             "default": "phantom_list"
         },
         "api_key": {
-            "description": "V1 API KEY",
+            "description": "V1 API Key",
             "data_type": "password",
             "order": 5
         }

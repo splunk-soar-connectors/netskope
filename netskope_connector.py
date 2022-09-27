@@ -71,6 +71,7 @@ class NetskopeConnector(BaseConnector):
         """
         error_code = NETSKOPE_ERR_CODE_MSG
         error_msg = NETSKOPE_ERR_MSG
+        self._dump_error_log(e)
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
@@ -78,11 +79,10 @@ class NetskopeConnector(BaseConnector):
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
-        except Exception as e:
-            self._dump_error_log(e)
-            self.error_print('Error occurred while retrieving exception information, Details: {}'.format(str(e)))
+        except Exception as ex:
+            self.error_print('Error occurred while retrieving exception information, Details: {}'.format(str(ex)))
 
-        return ('Error Code: {0}. Error Message: {1}').format(error_code, error_msg)
+        return 'Error Code: {0}. Error Message: {1}'.format(error_code, error_msg)
 
     @staticmethod
     def _process_empty_response(response, action_result):
@@ -135,7 +135,6 @@ class NetskopeConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
-            self._dump_error_log(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR,
                                                    'Unable to parse JSON response. Error: {0}'
                                                    .format(self._get_error_message_from_exception(e))), None)
@@ -186,7 +185,6 @@ class NetskopeConnector(BaseConnector):
             self._log.error(message)
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.info('exception_line={0} {1}'.format(exc_tb.tb_lineno, error_msg))
@@ -216,7 +214,6 @@ class NetskopeConnector(BaseConnector):
                     self._scim['url'] = config.get(NETSKOPE_CONFIG_SCIM_URL).strip('/')
                     self._scim['token'] = config.get(NETSKOPE_CONFIG_SCIM_KEY)
                 except Exception as e:
-                    self._dump_error_log(e)
                     error_msg = self._get_error_message_from_exception(e)
                     self.error_print('Error while encoding server URL')
                     return RetVal(action_result.set_status(phantom.APP_ERROR, ('Error while encoding server \
@@ -250,7 +247,6 @@ class NetskopeConnector(BaseConnector):
                 err = 'Error connecting to server. Invalid URL {0}'.format(url)
                 return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
             except Exception as err:
-                self._dump_error_log(err)
                 error_msg = self._get_error_message_from_exception(err)
 
                 if os.path.exists(temp_file_path):
@@ -267,7 +263,6 @@ class NetskopeConnector(BaseConnector):
             self._log.info('action=returning_success result={0} response={1}'.format(action_result, requests_response))
             return self._process_response(requests_response, action_result)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.info('exception_line={0} {1}'.format(exc_tb.tb_lineno, error_msg))
@@ -307,7 +302,6 @@ class NetskopeConnector(BaseConnector):
             self._tenant = self._server_url.split('//')[1]
             self._log.info('tenant={0}'.format(self._tenant))
         except Exception as ex:
-            self._dump_error_log(ex)
             self.error_print('Error while initializing server URL and basic connection parameters from the asset configuration')
             return RetVal(action_result.set_status(phantom.APP_ERROR, 'Error while initializing server URL and basic \
                            connection parameters from the asset configuration, Error: {}'
@@ -354,7 +348,6 @@ class NetskopeConnector(BaseConnector):
             err = 'Error connecting to server. Invalid URL {0}'.format(url)
             return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
         except Exception as err:
-            self._dump_error_log(err)
             error_msg = self._get_error_message_from_exception(err)
 
             if os.path.exists(temp_file_path):
@@ -455,7 +448,6 @@ class NetskopeConnector(BaseConnector):
 
                 vault_id = vault_add_file_dict['vault_id']
         except Exception as ex:
-            self._dump_error_log(ex)
             return action_result.set_status(phantom.APP_ERROR,
                                             'Error occurred while fetching the vault details, Error: {}'
                                             .format(self._get_error_message_from_exception(ex)))
@@ -1329,7 +1321,6 @@ class NetskopeConnector(BaseConnector):
             try:
                 input_dict_str = json.dumps(input_dict, sort_keys=True)
             except Exception as e:
-                self._dump_error_log(e)
                 error_msg = self._get_error_message_from_exception(e)
                 self.debug_print('Handled exception in _create_dict_hash', error_msg)
                 return
@@ -1418,7 +1409,6 @@ class NetskopeConnector(BaseConnector):
             summary['total_urls'] = len(content)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.error('exception_line={0} Update URL List: {1}'.format(exc_tb.tb_lineno, error_msg))
@@ -1548,7 +1538,6 @@ class NetskopeConnector(BaseConnector):
             summary['total_groups'] = len(resources)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.error('exception_line={0} Get SCIM Users: {1}'.format(exc_tb.tb_lineno, error_msg))
@@ -1580,7 +1569,6 @@ class NetskopeConnector(BaseConnector):
             summary['total_users'] = len(resources)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.error('exception_line={0} Get SCIM Users: {1}'.format(exc_tb.tb_lineno, error_msg))
@@ -1619,7 +1607,6 @@ class NetskopeConnector(BaseConnector):
             summary['total_users'] = len(resources)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.error('exception_line={0} Add User to Group SCIM: {1}'.format(exc_tb.tb_lineno, error_msg))
@@ -1649,7 +1636,6 @@ class NetskopeConnector(BaseConnector):
             summary['total_groups'] = 1
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.error(('exception_line={0} Add User to Group SCIM: {1}').format(exc_tb.tb_lineno, error_msg))
@@ -1684,7 +1670,6 @@ class NetskopeConnector(BaseConnector):
             summary['total_users'] = 1
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.error('exception_line={0} Add User to Group SCIM: {1}'.format(exc_tb.tb_lineno, error_msg))
@@ -1726,7 +1711,6 @@ class NetskopeConnector(BaseConnector):
             summary['total_hashes'] = len(content)
             return action_result.set_status(phantom.APP_SUCCESS)
         except Exception as e:
-            self._dump_error_log(e)
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
             self._log.error('exception_line={0} Update File Hash List: {1}'.format(exc_tb.tb_lineno, error_msg))

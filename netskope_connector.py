@@ -151,6 +151,9 @@ class NetskopeConnector(BaseConnector):
         else:
             if 200 <= response.status_code < 399:
                 return RetVal(phantom.APP_SUCCESS, resp_json)
+            
+            if response.status_code == 400 and self.get_action_identifier() == "update_url_list":
+                return RetVal(phantom.APP_ERROR, resp_json)
 
             error_message = response.text.replace('{', '{{').replace('}', '}}')
             return RetVal(action_result.set_status(phantom.APP_ERROR, error_message), None)
@@ -1335,18 +1338,12 @@ class NetskopeConnector(BaseConnector):
         """
         self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        ret_val = self._update_url_helper(action_result)
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _update_url_helper(self, action_result):
-        """Update URL helper."""
         try:
             exists, message, content = self.get_url_list()
             content = [element.strip() for element in content if element.strip()]
+            content = list(set(content))
+            invalid_url_list = []
 
             if not content:
                 return action_result.set_status(phantom.APP_ERROR, 'No content found to update the url list')
@@ -1365,7 +1362,8 @@ class NetskopeConnector(BaseConnector):
                 if phantom.is_fail(request_status):
                     return action_result.get_status()
 
-                list_type = request_response.get("data", {}).get("type")
+                # if type is missing in the response, will assign list_type as "exact" based on list url doc 
+                list_type = request_response.get("data", {}).get("type", "exact")
 
                 if not list_type:
                     self._log.error(('Failed to get the type of url list from: {0}'.format(str(request_response))))
@@ -1380,19 +1378,35 @@ class NetskopeConnector(BaseConnector):
                 }
 
                 # push the url list data to the Netskope server
-                request_status, _ = self._make_rest_call(endpoint=('{0}/replace'.format(url_list_endpoint)),
-                                                         action_result=action_result, data=data, method='patch')
+                request_status, resp_json = self._make_rest_call(endpoint=('{0}/replace'.format(url_list_endpoint)),
+                                                                 action_result=action_result, data=data, method='patch')
 
                 if phantom.is_fail(request_status):
-                    self._log.error('failed to update {0} url_list on the Netskope'.format(self._list_name))
-                    return action_result.get_status()
+                    if resp_json.get("statusCode") == 400 and resp_json.get("message"):
+                        invalid_url_list = [item[0] for item in resp_json["message"]]
+                        self.save_progress("Removing invalid URLs from the url list.")
+
+                        for item in invalid_url_list:
+                            content.remove(item)
+
+                        data['data']['urls'] = content
+
+                        # push the url list data to the Netskope server
+                        request_status, _ = self._make_rest_call(endpoint=('{0}/replace'.format(url_list_endpoint)),
+                                                                 action_result=action_result, data=data, method='patch')
+
+                        if phantom.is_fail(request_status):
+                            return action_result.get_status()
+                    else:
+                        self._log.error('failed to update {0} url_list on the Netskope'.format(self._list_name))
+                        return action_result.get_status()
 
                 self._log.info('successfully updated {0} url_list on the Netskope'.format(self._list_name))
                 request_status, _ = self._make_rest_call(endpoint='{0}/{1}'.format(NETSKOPE_V2_URL_LIST_ENDPOINT, NETSKOPE_DEPLOY_URL_LIST),
                                                          action_result=action_result, method='post')
 
                 if phantom.is_fail(request_status):
-                    self._log.error('failed to deploy url_list changes to the Netskope')
+                    self._log.error('Failed to deploy url_list changes to the Netskope')
                     return action_result.get_status()
             else:
                 params = {'list': ','.join(content), 'name': self._list_name}
@@ -1404,10 +1418,22 @@ class NetskopeConnector(BaseConnector):
                 if phantom.is_fail(request_status):
                     return action_result.get_status()
 
-            action_result.add_data({})
+            # removing from the phantom url list
+            remove_count = 0
+            for item in invalid_url_list:
+                status, remove_msg = phantom_rules.delete_from_list(list_name=self._url_list,
+                                                                    value=item,
+                                                                    remove_all=True,
+                                                                    remove_row=True)
+                self.debug_print(f"Removing URL {item} from the url list. status: {status} , remove_msg : {remove_msg}")
+                if status:
+                    remove_count += 1
+
             summary = action_result.update_summary({})
-            summary['total_urls'] = len(content)
-            return action_result.set_status(phantom.APP_SUCCESS)
+            summary['total_updated_urls'] = len(content)
+            summary['total_removed_urls'] = remove_count
+            summary['invalid_urls'] = invalid_url_list
+            return action_result.set_status(phantom.APP_SUCCESS, f"Successfully updated URLs: Total updated unique URLs: {summary['total_updated_urls']}, Total removed URLs: {summary['total_removed_urls']}")
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -1420,36 +1446,11 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
+
         self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self._log.info('param={0}'.format(json.dumps(param)))
-        status, msg, matches = phantom_rules.check_list(list_name=self._url_list, value=param[NETSKOPE_PARAM_URL])
-        self._log.info('action=checking_for_matches status={0} msg={1} matches={2}'.format(status, msg, matches))
 
-        if status:
-            return action_result.set_status(phantom.APP_SUCCESS, '{0} already exists in list'.format(param[NETSKOPE_PARAM_URL]))
-        self.debug_print("Fetching url list")
-        status, msg, list_items = self.get_url_list()
-
-        if not status:
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to fetch url list. Error: {0}'.format(msg))
-
-        list_items.append(param[NETSKOPE_PARAM_URL])
-        url_list = list(set(list_items))
-        self._log.debug('unique_list={0}'.format(url_list))
-        status, set_msg = phantom_rules.set_list(list_name=self._url_list, values=[[x] for x in url_list])
-
-        if not status:
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to add url to the list. Error: {0}'.format(set_msg))
-
-        self._log.info('action=set_list status={0} msg={1}'.format(status, set_msg))
-        summary = action_result.update_summary({})
-
-        if set_msg != NETSKOPE_MISSING_MSG:
-            summary['set_list'] = set_msg
-
-        summary['total_urls'] = len(url_list)
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return self._add_list(action_result, 'url list', param[NETSKOPE_PARAM_URL])
 
     def _handle_remove_url_list(self, param):
         """Remove URL from URL list.
@@ -1716,6 +1717,72 @@ class NetskopeConnector(BaseConnector):
             self._log.error('exception_line={0} Update File Hash List: {1}'.format(exc_tb.tb_lineno, error_msg))
             return action_result.set_status(phantom.APP_ERROR, 'Exception {0}: line={1}'.format(error_msg, exc_tb.tb_lineno))
 
+    def _add_list(self, action_result, list_type, new_list_name):
+        base_url = self._get_phantom_base_url()
+        base_url = base_url[:-1] if base_url.endswith('/') else base_url
+
+        get_url = base_url + REST_GET_LIST_ENDPOINT
+        list_name = self._url_list if list_type == "url list" else self._file_list
+
+        self.debug_print(f"Fetching {list_type}")
+        try:
+            r = requests.get(get_url, verify=False)
+            response_json = r.json()
+            list_id = next((item["id"] for item in response_json["data"] if item.get("name") == list_name), None)
+            if response_json.get("num_pages", 0) > 1 and not list_id:
+                for page in range(1, response_json["num_pages"]):
+                    r = requests.get(get_url, params={"page": page}, verify=False)
+                    response_json = r.json()
+                    list_id = next((item["id"] for item in response_json["data"] if item.get("name") == list_name), None)
+                    if list_id:
+                        break
+
+            get_url = get_url + str(list_id)
+            r = requests.get(get_url, verify=False)
+            response_json = r.json()
+            if not response_json.get("content"):
+                return action_result.set_status(phantom.APP_ERROR, f'Failed to fetch {list_type}. Error: {response_json.get("message")}')
+
+            nested_list = response_json["content"]
+            old_list = [item for sublist in nested_list for item in sublist]
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            self.debug_print(error_msg)
+            return action_result.set_status(phantom.APP_ERROR, f'Failed to fetch {list_type}. Error: {error_msg}')
+
+        if new_list_name in old_list:
+            return action_result.set_status(phantom.APP_SUCCESS, f'{new_list_name} already exists in list')
+
+        post_url = base_url + REST_ADD_LIST_ENDPOINT.format(list_id=list_id)
+
+        old_list.append(new_list_name)
+        new_list = list(set(old_list))
+        values = [[x] for x in new_list]
+        data = {"content": values}
+        data = json.dumps(data)
+
+        try:
+            r = requests.post(post_url, data=data, verify=False)
+            data = r.json()
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
+            return action_result.set_status(phantom.APP_ERROR, f'Failed to add {list_type}. Error: {error_msg}')
+
+        if not data.get("success"):
+            return action_result.set_status(phantom.APP_ERROR, f'Failed to add {list_type}. Error: {error_msg}')
+
+        summary = action_result.update_summary({})
+
+        if data.get("message"):
+            summary['set_list'] = data.get("message")
+
+        if list_type == 'url list':
+            summary['total_urls'] = len(new_list)
+        else:
+            summary['total_hashes'] = len(new_list)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_add_file_list(self, param):
         """Add file to a list.
 
@@ -1725,31 +1792,7 @@ class NetskopeConnector(BaseConnector):
         self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self._log.info('param={0}'.format(json.dumps(param)))
-        status, msg, matches = phantom_rules.check_list(list_name=self._file_list, value=param[NETSKOPE_PARAM_HASH])
-        self._log.info('action=checking_for_matches status={0} msg={1} matches={2}'.format(status, msg, matches))
-
-        if status:
-            return action_result.set_status(phantom.APP_SUCCESS, '{0} already exists in list'.format(param[NETSKOPE_PARAM_HASH]))
-        self.debug_print("Fetching file list")
-        status, msg, list_items = self.get_file_list()
-
-        if not status:
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to fetch file list. Error: {0}'.format(msg))
-
-        list_items.append(param[NETSKOPE_PARAM_HASH])
-        file_list = list(set(list_items))
-        self._log.debug('unique_list={0}'.format(file_list))
-        status, set_msg = phantom_rules.set_list(list_name=self._file_list, values=[[x] for x in file_list])
-
-        self._log.info('action=set_list status={0} msg={1}'.format(status, set_msg))
-        summary = action_result.update_summary({})
-
-        if set_msg != NETSKOPE_MISSING_MSG:
-            summary['set_list'] = set_msg
-
-        summary['total_hashes'] = len(file_list)
-        return action_result.set_status(phantom.APP_SUCCESS)
+        return self._add_list(action_result, "file list", param[NETSKOPE_PARAM_HASH])
 
     def _handle_remove_file_list(self, param):
         """Remove files from a list.

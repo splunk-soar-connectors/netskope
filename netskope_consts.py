@@ -77,3 +77,7 @@ NETSKOPE_ACTION_HANDLER_MSG = "In action handler for: {0}"
 
 # Timeout
 NETSKOPE_DEFAULT_TIMEOUT = 30
+
+
+REST_GET_LIST_ENDPOINT = "/rest/decided_list/"
+REST_ADD_LIST_ENDPOINT = "/rest/decided_list/{list_id}/"

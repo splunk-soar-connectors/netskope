@@ -278,17 +278,17 @@ class NetskopeConnector(BaseConnector):
                 else:
                     requests_response = request_func(url, headers=headers, data=json.dumps(params), timeout=timeout)
             except requests.exceptions.InvalidURL:
-                err = "Error connecting to server. Invalid URL {0}".format(url)
-                return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
-            except Exception as err:
-                error_msg = self._get_error_message_from_exception(err)
+                e = "Error connecting to server. Invalid URL {0}".format(url)
+                return RetVal(action_result.set_status(phantom.APP_ERROR, e), resp_json)
+            except Exception as e:
+                error_msg = self._get_error_message_from_exception(e)
 
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
 
                 self._log.error("action=failed exception={0}".format(error_msg))
                 message = "Error connecting to server. Details: {0}".format(error_msg)
-                if "token=" in err:
+                if "token=" in e:
                     message = "Error while connecting to the server"
 
                 self._log.info("action=failed response={0}".format(resp_json))
@@ -386,16 +386,16 @@ class NetskopeConnector(BaseConnector):
             message = "Error Details: Connection Refused from the Server. {0}".format(error_msg)
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         except requests.exceptions.InvalidURL:
-            err = "Error connecting to server. Invalid URL {0}".format(url)
-            return RetVal(action_result.set_status(phantom.APP_ERROR, err), resp_json)
-        except Exception as err:
-            error_msg = self._get_error_message_from_exception(err)
+            e = "Error connecting to server. Invalid URL {0}".format(url)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, e), resp_json)
+        except Exception as e:
+            error_msg = self._get_error_message_from_exception(e)
 
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
 
             message = "Error connecting to server. Details: {0}".format(error_msg)
-            if "token=" in err:
+            if "token=" in e:
                 message = "Error while connecting to the server"
 
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
@@ -528,10 +528,10 @@ class NetskopeConnector(BaseConnector):
             # find and return the profile_id, file_name and file_id from the response
             for item in request_response["data"]["quarantined"]:
                 # check for the file id and name only if profile matches the input data
-                if (
-                    item.get("quarantine_profile_id", "").lower() == profile_param.lower()
-                    or item.get("quarantine_profile_name", "").lower() == profile_param.lower()
-                ):  # noqa: E501
+                profile_id_match = item.get("quarantine_profile_id", "").lower() == profile_param.lower()
+                profile_name_match = item.get("quarantine_profile_name", "").lower() == profile_param.lower()
+
+                if profile_id_match or profile_name_match: # noqa: E501
                     profile_id = item["quarantine_profile_id"]
                     for file_item in item.get("files", []):
                         if file_item["file_id"] == file_param or file_item["quarantined_file_name"].lower() == file_param.lower():

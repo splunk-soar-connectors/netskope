@@ -52,11 +52,11 @@ NETSKOPE_V2_CONNECTIVITY_PASS_MSG = "Test Connectivity Passed for v2 API key"
 NETSKOPE_CONNECTIVITY_FAIL_MSG = "Test Connectivity Failed for v1 API key"
 NETSKOPE_V2_CONNECTIVITY_FAIL_MSG = "Test Connectivity Failed for v2 API key"
 NETSKOPE_CONNECTION_MSG = "Querying endpoint to verify the credentials provided"
-NETSKOPE_ERR_CONNECTING_SERVER = "Error while connecting to server"
+NETSKOPE_ERROR_CONNECTING_SERVER = "Error while connecting to server"
 NETSKOPE_V2_KEY_FOUND_MSG = "Found v2 API key in asset configuration"
 NETSKOPE_V2_CONNECTION_MSG = "Querying endpoint to verify the key provided"
-NETSKOPE_ERR_CODE_MSG = "Error code unavailable"
-NETSKOPE_ERR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters"
+NETSKOPE_ERROR_CODE_MSG = "Error code unavailable"
+NETSKOPE_ERROR_MSG = "Unknown error occurred. Please check the asset configuration and|or action parameters"
 NETSKOPE_JSON_FILE = "file"
 NETSKOPE_JSON_PROFILE = "profile"
 NETSKOPE_TEST_CONNECTIVITY_LIMIT = 1
@@ -67,11 +67,11 @@ NETSKOPE_DEFAULT_LIMIT = 50
 NETSKOPE_URL_LIST = "netskope_url_list"
 NETSKOPE_FILE_LIST = "netskope_file_list"
 NETSKOPE_LIST_NAME = "list_name"
-NETSKOPE_STATE_FILE_CORRUPT_ERR = (
+NETSKOPE_STATE_FILE_CORRUPT_ERROR = (
     "Error occurred while loading the state file due to its unexpected format. "
     "Resetting the state file with the default format. Please try again."
 )
-NETSKOPE_MISSING_MSG = "MISSING MESSAGE"
+NETSKOPE_MISSING_MESSAGE = "MISSING MESSAGE"
 NETSKOPE_MISSING_BOTH_API_KEYS_ERR = "Please configure either 'v1 API Key' or 'v2 API Key'(recommended)"
 NETSKOPE_ACTION_HANDLER_MSG = "In action handler for: {0}"
 

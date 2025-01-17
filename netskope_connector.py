@@ -76,13 +76,13 @@ class NetskopeConnector(BaseConnector):
             if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
-                    error_msg = e.args[1]
+                    error_message = e.args[1]
                 elif len(e.args) == 1:
-                    error_msg = e.args[0]
+                    error_message = e.args[0]
         except Exception as ex:
             self._dump_error_log(ex, "Error occurred while retrieving exception information")
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
 
     @staticmethod
     def _process_empty_response(response, action_result):

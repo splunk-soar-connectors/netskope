@@ -9,7 +9,7 @@
     "product_name": "Netskope",
     "product_version_regex": ".*",
     "publisher": "Netskope",
-    "license": "Copyright 2018-2022 Netskope, Inc.",
+    "license": "Copyright 2018-2025 Netskope, Inc.",
     "app_version": "3.1.0",
     "utctime_updated": "2022-01-21T22:23:47.000000Z",
     "package_name": "phantom_netskope",
@@ -2877,7 +2877,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/py3/certifi-2022.9.24-py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2025.9.24-py3-none-any.whl"
             },
             {
                 "module": "chardet",

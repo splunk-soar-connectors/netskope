@@ -531,7 +531,7 @@ class NetskopeConnector(BaseConnector):
                 profile_id_match = item.get("quarantine_profile_id", "").lower() == profile_param.lower()
                 profile_name_match = item.get("quarantine_profile_name", "").lower() == profile_param.lower()
 
-                if profile_id_match or profile_name_match: # noqa: E501
+                if profile_id_match or profile_name_match:  # noqa: E501
                     profile_id = item["quarantine_profile_id"]
                     for file_item in item.get("files", []):
                         if file_item["file_id"] == file_param or file_item["quarantined_file_name"].lower() == file_param.lower():

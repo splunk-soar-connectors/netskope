@@ -1533,7 +1533,9 @@ class NetskopeConnector(BaseConnector):
             summary["invalid_urls"] = invalid_url_list
             return action_result.set_status(
                 phantom.APP_SUCCESS,
-                f"Successfully updated URLs: Total updated unique URLs: {summary['total_updated_urls']}, Total removed URLs: {summary['total_removed_urls']}",
+                "Successfully updated URLs: Total updated unique URLs: {}, Total removed URLs: {}".format(
+                    summary['total_updated_urls'], summary['total_removed_urls']
+                ),
             )
         except Exception as e:
             error_msg = self._get_error_message_from_exception(e)

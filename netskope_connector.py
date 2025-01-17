@@ -1534,7 +1534,7 @@ class NetskopeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_SUCCESS,
                 "Successfully updated URLs: Total updated unique URLs: {}, Total removed URLs: {}".format(
-                    summary['total_updated_urls'], summary['total_removed_urls']
+                    summary["total_updated_urls"], summary["total_removed_urls"]
                 ),
             )
         except Exception as e:

@@ -70,7 +70,7 @@ class NetskopeConnector(BaseConnector):
         :return: error message
         """
         error_code = NETSKOPE_ERROR_CODE_MESSAGE
-        error_message = NETSKOPE_error_message
+        error_message = NETSKOPE_ERROR_MESSAGE
         self._dump_error_log(e)
         try:
             if hasattr(e, "args"):

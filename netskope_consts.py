@@ -72,7 +72,7 @@ NETSKOPE_STATE_FILE_CORRUPT_ERROR = (
     "Resetting the state file with the default format. Please try again."
 )
 NETSKOPE_MISSING_MESSAGE = "MISSING MESSAGE"
-NETSKOPE_MISSING_BOTH_API_KEYS_ERR = "Please configure either 'v1 API Key' or 'v2 API Key'(recommended)"
+NETSKOPE_MISSING_BOTH_API_KEYS_ERROR = "Please configure either 'v1 API Key' or 'v2 API Key'(recommended)"
 NETSKOPE_ACTION_HANDLER_MESSAGE = "In action handler for: {0}"
 
 # Timeout

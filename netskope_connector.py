@@ -69,7 +69,7 @@ class NetskopeConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_code = NETSKOPE_ERROR_CODE_MSG
+        error_code = NETSKOPE_ERROR_CODE_MESSAGE
         error_message = NETSKOPE_error_message
         self._dump_error_log(e)
         try:
@@ -413,21 +413,21 @@ class NetskopeConnector(BaseConnector):
 
         # Checking connectivity for v1 API if v1 api key provided
         if self._api_key:
-            self.save_progress(NETSKOPE_CONNECTION_MSG)
+            self.save_progress(NETSKOPE_CONNECTION_MESSAGE)
             ret_val, _ = self._make_rest_call(
                 endpoint=NETSKOPE_CONNECTIVITY_ENDPOINT, action_result=action_result, params=request_param, timeout=30
             )
 
             if phantom.is_fail(ret_val):
-                self.save_progress(NETSKOPE_CONNECTIVITY_FAIL_MSG)
+                self.save_progress(NETSKOPE_CONNECTIVITY_FAIL_MESSAGE)
                 self.save_progress(action_result.get_message())
             else:
-                self.save_progress(NETSKOPE_CONNECTIVITY_PASS_MSG)
+                self.save_progress(NETSKOPE_CONNECTIVITY_PASS_MESSAGE)
 
         # Checking connectivity for v2 API if v2 api key provided
         if self._v2_api_key:
-            self.save_progress(NETSKOPE_V2_KEY_FOUND_MSG)
-            self.save_progress(NETSKOPE_V2_CONNECTION_MSG)
+            self.save_progress(NETSKOPE_V2_KEY_FOUND_MESSAGE)
+            self.save_progress(NETSKOPE_V2_CONNECTION_MESSAGE)
             current_time = int(time.time())
             request_param.update({"starttime": current_time - NETSKOPE_24_HOUR_GAP, "endtime": current_time})
             ret_val, _ = self._make_rest_call(
@@ -438,10 +438,10 @@ class NetskopeConnector(BaseConnector):
             )
 
             if phantom.is_fail(ret_val):
-                self.save_progress(NETSKOPE_V2_CONNECTIVITY_FAIL_MSG)
+                self.save_progress(NETSKOPE_V2_CONNECTIVITY_FAIL_MESSAGE)
                 return action_result.get_status()
 
-            self.save_progress(NETSKOPE_V2_CONNECTIVITY_PASS_MSG)
+            self.save_progress(NETSKOPE_V2_CONNECTIVITY_PASS_MESSAGE)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -451,7 +451,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         file_param = param[NETSKOPE_JSON_FILE]
         profile_param = param[NETSKOPE_JSON_PROFILE]
@@ -565,7 +565,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         params = {"op": NETSKOPE_PARAM_LIST_FILES}
         request_status, request_response = self._make_rest_call(
@@ -628,7 +628,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         ip = param[NETSKOPE_PARAM_IP]
 
@@ -735,11 +735,11 @@ class NetskopeConnector(BaseConnector):
             if not container_id:
                 continue
 
-            artifacts_creation_status, artifacts_creation_msg = self._create_artifacts(alert=alert, container_id=container_id)
+            artifacts_creation_status, artifacts_creation_message = self._create_artifacts(alert=alert, container_id=container_id)
             if phantom.is_fail(artifacts_creation_status):
                 self.debug_print(
-                    "Error while creating artifacts for container with ID {container_id}. {error_msg}".format(
-                        container_id=container_id, error_msg=artifacts_creation_msg
+                    "Error while creating artifacts for container with ID {container_id}. {error_message}".format(
+                        container_id=container_id, error_message=artifacts_creation_message
                     )
                 )
 
@@ -812,13 +812,13 @@ class NetskopeConnector(BaseConnector):
             "type": alert.get("type"),
         }
         container_dict["tags"] = ["{0}={1}".format(x, possible_tags[x]) for x in possible_tags if possible_tags[x] is not None]
-        container_creation_status, container_creation_msg, container_id = self.save_container(container=container_dict)
+        container_creation_status, container_creation_message, container_id = self.save_container(container=container_dict)
 
         if phantom.is_fail(container_creation_status):
-            self.debug_print(container_creation_msg)
+            self.debug_print(container_creation_message)
             self.save_progress(
                 "Error while creating container for alert {alert_name}. {error_message}".format(
-                    alert_name=alert["alert_name"], error_message=container_creation_msg
+                    alert_name=alert["alert_name"], error_message=container_creation_message
                 )
             )
         else:
@@ -1395,10 +1395,10 @@ class NetskopeConnector(BaseConnector):
                 temp_dict["tenant"] = self._tenant
                 artifacts_list.append(temp_dict)
 
-        create_artifact_status, create_artifact_msg, _ = self.save_artifacts(artifacts_list)
+        create_artifact_status, create_artifact_message, _ = self.save_artifacts(artifacts_list)
 
         if phantom.is_fail(create_artifact_status):
-            return phantom.APP_ERROR, create_artifact_msg
+            return phantom.APP_ERROR, create_artifact_message
 
         return phantom.APP_SUCCESS, "Artifacts created successfully"
 
@@ -1438,7 +1438,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
@@ -1522,8 +1522,8 @@ class NetskopeConnector(BaseConnector):
             # removing from the phantom url list
             remove_count = 0
             for item in invalid_url_list:
-                status, remove_msg = phantom_rules.delete_from_list(list_name=self._url_list, value=item, remove_all=True, remove_row=True)
-                self.debug_print(f"Removing URL {item} from the url list. status: {status} , remove_msg : {remove_msg}")
+                status, remove_message = phantom_rules.delete_from_list(list_name=self._url_list, value=item, remove_all=True, remove_row=True)
+                self.debug_print(f"Removing URL {item} from the url list. status: {status} , remove_message : {remove_message}")
                 if status:
                     remove_count += 1
 
@@ -1550,7 +1550,7 @@ class NetskopeConnector(BaseConnector):
         :return: status success/failure
         """
 
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         return self._add_list(action_result, "url list", param[NETSKOPE_PARAM_URL])
@@ -1561,35 +1561,35 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         self._log.info("param={0}".format(json.dumps(param)))
         self.debug_print("Fetching url list")
-        status, msg, list_items = self.get_url_list()
+        status, message, list_items = self.get_url_list()
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch url list. Error: {0}".format(msg))
+            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch url list. Error: {0}".format(message))
 
         found_rows = [True for _, v in enumerate(list_items) if v == param[NETSKOPE_PARAM_URL]]
-        self._log.info("action=checking_for_matches status={0} msg={1} matches={2}".format(status, msg, found_rows))
+        self._log.info("action=checking_for_matches status={0} message={1} matches={2}".format(status, message, found_rows))
 
         if not found_rows:
             return action_result.set_status(phantom.APP_SUCCESS, "{0} does not exist in list".format((param[NETSKOPE_PARAM_URL])))
 
-        status, remove_msg = phantom_rules.delete_from_list(
+        status, remove_message = phantom_rules.delete_from_list(
             list_name=self._url_list, value=param[NETSKOPE_PARAM_URL], remove_all=True, remove_row=True
         )
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to delete url from the list. Error: {0}".format(remove_msg))
+            return action_result.set_status(phantom.APP_ERROR, "Failed to delete url from the list. Error: {0}".format(remove_message))
 
         if found_rows and len(list_items) == 1:
             status, _ = phantom_rules.set_list(list_name=self._url_list, values=[[]])
-            remove_msg = "Deleted Single Row"
+            remove_message = "Deleted Single Row"
 
-        self._log.info("action=delete_from_list status={0} msg={1}".format(status, remove_msg))
-        status, msg, list_items = self.get_url_list()
-        summary = action_result.update_summary({"remove_msg": remove_msg})
+        self._log.info("action=delete_from_list status={0} message={1}".format(status, remove_message))
+        status, message, list_items = self.get_url_list()
+        summary = action_result.update_summary({"remove_message": remove_message})
         summary["total_urls"] = len(list_items)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1627,7 +1627,7 @@ class NetskopeConnector(BaseConnector):
         :return: status success/failure
         """
         self._log.debug("parameters={0}".format(param))
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             if NETSKOPE_PARAM_GROUP in param:
@@ -1659,7 +1659,7 @@ class NetskopeConnector(BaseConnector):
         :return: status success/failure
         """
         self._log.debug("parameters={0}".format(param))
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             if NETSKOPE_PARAM_USER in param:
@@ -1691,7 +1691,7 @@ class NetskopeConnector(BaseConnector):
         :return: status success/failure
         """
         self._log.info("parameters={0}".format(param))
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             data = {
@@ -1728,7 +1728,7 @@ class NetskopeConnector(BaseConnector):
         :return: status success/failure
         """
         self._log.info("parameters={0}".format(param))
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             data = {"displayName": param[NETSKOPE_PARAM_GROUP], "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"]}
@@ -1757,7 +1757,7 @@ class NetskopeConnector(BaseConnector):
         :return: status success/failure
         """
         self._log.info("parameters={0}".format(param))
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             data = {
@@ -1791,7 +1791,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         ret_val = self._update_file_helper(action_result)
 
@@ -1898,7 +1898,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         return self._add_list(action_result, "file list", param[NETSKOPE_PARAM_HASH])
@@ -1909,37 +1909,37 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self.save_progress(NETSKOPE_ACTION_HANDLER_MSG.format(self.get_action_identifier()))
+        self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         self._log.info("param={0}".format(json.dumps(param)))
         self.debug_print("Fetching file list")
-        status, msg, list_items = self.get_file_list()
+        status, message, list_items = self.get_file_list()
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch file list. Error: {0}".format(msg))
+            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch file list. Error: {0}".format(message))
 
         found_rows = [True for _, v in enumerate(list_items) if v == param[NETSKOPE_PARAM_HASH]]
-        self._log.info("action=checking_for_matches status={0} msg={1} matches={2}".format(status, msg, found_rows))
+        self._log.info("action=checking_for_matches status={0} message={1} matches={2}".format(status, message, found_rows))
 
         if not found_rows:
             return action_result.set_status(phantom.APP_SUCCESS, "{0} does not exist in list".format(param[NETSKOPE_PARAM_HASH]))
 
-        status, remove_msg = phantom_rules.delete_from_list(
+        status, remove_message = phantom_rules.delete_from_list(
             list_name=self._file_list, value=param[NETSKOPE_PARAM_HASH], remove_all=True, remove_row=True
         )
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to delete file hash from a list. Error: {0}".format(remove_msg))
+            return action_result.set_status(phantom.APP_ERROR, "Failed to delete file hash from a list. Error: {0}".format(remove_message))
 
         if found_rows and len(list_items) == 1:
             status, _ = phantom_rules.set_list(list_name=self._file_list, values=[[]])
-            remove_msg = "Deleted Single Row"
+            remove_message = "Deleted Single Row"
 
-        self._log.info("action=delete_from_list status={0} msg={1}".format(status, remove_msg))
-        status, msg, list_items = self.get_file_list()
-        self._log.info("action=after_delete_from_list status={0} msg={1} list_length={2}".format(status, msg, len(list_items)))
-        summary = action_result.update_summary({"remove_msg": remove_msg})
+        self._log.info("action=delete_from_list status={0} message={1}".format(status, remove_message))
+        status, message, list_items = self.get_file_list()
+        self._log.info("action=after_delete_from_list status={0} message={1} list_length={2}".format(status, message, len(list_items)))
+        summary = action_result.update_summary({"remove_message": remove_message})
         summary["total_files"] = len(list_items)
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1983,10 +1983,10 @@ class NetskopeConnector(BaseConnector):
 
     def get_url_list(self):
         """Get URL list."""
-        status, msg, pl = phantom_rules.get_list(self._url_list)
+        status, message, pl = phantom_rules.get_list(self._url_list)
         pl2 = [x[0] for x in pl if len(x) > 0]
-        self._log.info("action=get_url_list status={0} msg={1}".format(status, msg))
-        return status, msg, [x for x in pl2 if x is not None]
+        self._log.info("action=get_url_list status={0} message={1}".format(status, message))
+        return status, message, [x for x in pl2 if x is not None]
 
     def create_url_list(self):
         """Create URL list."""
@@ -1994,10 +1994,10 @@ class NetskopeConnector(BaseConnector):
 
     def get_file_list(self):
         """Get file list."""
-        status, msg, pl = phantom_rules.get_list(self._file_list)
+        status, message, pl = phantom_rules.get_list(self._file_list)
         pl2 = [x[0] for x in pl if len(x) > 0]
-        self._log.info("action=get_url_list status={0} msg={1}".format(status, msg))
-        return status, msg, [x for x in pl2 if x is not None]
+        self._log.info("action=get_url_list status={0} message={1}".format(status, message))
+        return status, message, [x for x in pl2 if x is not None]
 
     def create_file_list(self):
         """Create file list."""

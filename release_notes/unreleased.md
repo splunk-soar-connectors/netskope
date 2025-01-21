@@ -1,1 +1,2 @@
 **Unreleased**
+* Fixed bug related to the 'add url' and 'update url' actions

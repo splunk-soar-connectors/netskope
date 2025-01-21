@@ -2,7 +2,7 @@
 # Netskope
 
 Publisher: Netskope  
-Connector Version: 3.1.0  
+Connector Version: 3.1.1  
 Product Vendor: Netskope  
 Product Name: Netskope  
 Product Version Supported (regex): ".\*"  

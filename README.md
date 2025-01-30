@@ -110,7 +110,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
 [get file](#action-get-file) - Download a quarantined file and upload it to the vault \
 [get scim users](#action-get-scim-users) - Get current SCIM user(s). If no parameter is sent, it will retrieve all users \
-[get scim groups](#action-get-scim-groups) - Get current SCIM group(s). If no parameter is sent, it will retrieve all users \
+[get scim groups](#action-get-scim-groups) - Get current SCIM group(s). If no parameter is sent, it will retrieve all groups \
 [create scim group](#action-create-scim-group) - Create SCIM group \
 [create scim user](#action-create-scim-user) - Create SCIM user \
 [scim user group](#action-scim-user-group) - Add or Remove a user from a SCIM group \
@@ -202,7 +202,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 ## action: 'get scim groups'
 
-Get current SCIM group(s). If no parameter is sent, it will retrieve all users
+Get current SCIM group(s). If no parameter is sent, it will retrieve all groups
 
 Type: **investigate** \
 Read only: **True**
@@ -316,6 +316,9 @@ action_result.status | string | | success failed |
 action_result.parameter.action | string | | add remove |
 action_result.parameter.group | string | `netskope scim group id` | 011d0b10-9176-46ac-bb01-10e15949d26c |
 action_result.parameter.user | string | `netskope scim user id` | test@gmail.com 6f1209b4-a3c0-4266-a53b-0f0858480ed6 |
+action_result.message | string | | Total users: 0 |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
 
 ## action: 'list files'
 

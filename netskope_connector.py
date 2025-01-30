@@ -629,9 +629,7 @@ class NetskopeConnector(BaseConnector):
         params.update({"starttime": start_time, "endtime": end_time})
         event_details = {}
         page_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_PAGE_EVENT)
-        ret_val, page_event_list = self._get_events(
-            endpoint=page_event_endpoint, action_result=action_result, params=params
-        )
+        ret_val, page_event_list = self._get_events(endpoint=page_event_endpoint, action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Failed to get 'page' events. Error: {0}".format(action_result.get_message()))
@@ -640,9 +638,7 @@ class NetskopeConnector(BaseConnector):
             event_details["page"] = page_event_list
 
         application_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_APPLICATION_EVENT)
-        ret_val, application_event_list = self._get_events(
-            endpoint=application_event_endpoint, action_result=action_result, params=params
-        )
+        ret_val, application_event_list = self._get_events(endpoint=application_event_endpoint, action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(
@@ -1673,10 +1669,8 @@ class NetskopeConnector(BaseConnector):
             return action_result.set_status(
                 phantom.APP_SUCCESS,
                 "Successfully {0}ed user={1} in group={2}.".format(
-                    param.get("action", "add"),
-                    param[NETSKOPE_PARAM_USER],
-                    param[NETSKOPE_PARAM_GROUP]
-                )
+                    param.get("action", "add"), param[NETSKOPE_PARAM_USER], param[NETSKOPE_PARAM_GROUP]
+                ),
             )
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)

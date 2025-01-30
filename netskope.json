@@ -36,13 +36,13 @@
         "list_name": {
             "description": "Netskope List Name (both URL and file hash)",
             "data_type": "string",
-            "order": 4,
+            "order": 2,
             "default": "phantom_list"
         },
         "api_key": {
             "description": "V1 API Key",
             "data_type": "password",
-            "order": 5
+            "order": 3
         }
     },
     "actions": [
@@ -324,7 +324,7 @@
         {
             "action": "get scim groups",
             "identifier": "get_scim_groups",
-            "description": "Get current SCIM group(s). If no parameter is sent, it will retrieve all users",
+            "description": "Get current SCIM group(s). If no parameter is sent, it will retrieve all groups",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -757,6 +757,27 @@
                     "example_values": [
                         "test@gmail.com",
                         "6f1209b4-a3c0-4266-a53b-0f0858480ed6"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Total users: 0"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
                     ]
                 }
             ],

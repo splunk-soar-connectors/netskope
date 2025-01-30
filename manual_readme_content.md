@@ -54,24 +54,25 @@ ports used by the Splunk SOAR Connector.
 <div id="action-notes" class="section">
 
 ## Action Notes
-
--   Below actions will use V2 REST API
-    [endpoints](https://docs.netskope.com/en/rest-api-v2-overview-312207.html) if **V2 API Key** is
-    configured in the asset. Actions will continue to support V1 API Key if V2 API Key is not
-    provided, but it is recommended to use V2 API Key.
+-   Below actions will continue to use V1 API endpoints so without configuring **V1 API Key** below actions will fail.
+    -   update hash
+    -   list files
+    -   get file
+-   Below actions will use V2 REST API endpoints. It is mandatory to configure the V2 API Key in the asset. Actions will fail without a V2 API Key.
+    [endpoints](https://docs.netskope.com/en/rest-api-v2-overview-312207.html)
     -   run query
     -   update url
     -   on poll
+    -   get scim users
+    -   get scim groups
+    -   create scim group
+    -   create scim user
+    -   scim user group
 -   Test Connectivity will behave as described below:
     -   If V1 API Key is configured, then the connectivity will be checked for V1 API Key
     -   If V2 API Key is configured, then the connectivity will be checked for V2 API Key
     -   If both are configured then the connectivity will be checked with both API Keys
     -   If none is provided then the message will be thrown to configure at least one
--   Below actions will continue to use V1 API endpoints so without configuring **V1 API Key** below
-    actions will fail.
-    -   update hash
-    -   list files
-    -   get file
 -   Actions listed below just update the Splunk SOAR list and do not make any REST calls to the
     Netskope, so they'll work without any API Key.
     -   add url

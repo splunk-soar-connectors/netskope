@@ -1672,7 +1672,11 @@ class NetskopeConnector(BaseConnector):
 
             return action_result.set_status(
                 phantom.APP_SUCCESS,
-                "Successfully {0}ed user={1} in group={2}.".format(param.get("action", "add"), param[NETSKOPE_PARAM_USER],param[NETSKOPE_PARAM_GROUP])
+                "Successfully {0}ed user={1} in group={2}.".format(
+                    param.get("action", "add"),
+                    param[NETSKOPE_PARAM_USER],
+                    param[NETSKOPE_PARAM_GROUP]
+                )
             )
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
@@ -1977,8 +1981,6 @@ class NetskopeConnector(BaseConnector):
         config = self.get_config()
         self._file_list = "{0}_{1}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_FILE_LIST)
         self._url_list = "{0}_{1}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_URL_LIST)
-
-
         list_status, message, list_contents = self.get_url_list()
         self._log.info("action=get_url_list status={0} message={1} contents_length={2}".format(list_status, message, len(list_contents)))
 

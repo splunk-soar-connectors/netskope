@@ -297,7 +297,7 @@ class NetskopeConnector(BaseConnector):
             "get_scim_groups",
             "create_scim_group",
             "create_scim_user",
-            "scim_user_to_group"
+            "scim_user_to_group",
         ]
         only_v1_supported_actions_list = ["list_files", "get_file", "update_file_list"]
 

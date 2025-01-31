@@ -723,7 +723,7 @@ action_result.parameter.hash | string | `hash` `md5` `sha256` | |
 action_result.data | string | | |
 action_result.summary.remove_msg | string | | Deleted Single Row |
 action_result.summary.total_files | numeric | | 1 |
-action_result.message | string | | Total files: 2, Remove msg: Removed 1 instances of "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad" from "test_list_netskope_file_list" |
+action_result.message | string | | Total files: 2, Remove msg: Removed 1 instances of "testxxxba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015adxxxtest" from "test_list_netskope_file_list" |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

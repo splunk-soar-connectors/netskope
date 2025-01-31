@@ -289,11 +289,20 @@ class NetskopeConnector(BaseConnector):
         response obtained by making an API call
         """
         action = self.get_action_identifier()
-        v2_supported_actions_list = ["run_query", "update_url_list"]
+        v2_supported_actions_list = [
+            "run_query",
+            "update_url_list",
+            "on_poll",
+            "get_scim_users",
+            "get_scim_groups",
+            "create_scim_group",
+            "create_scim_user",
+            "scim_user_to_group"
+        ]
         only_v1_supported_actions_list = ["list_files", "get_file", "update_file_list"]
 
-        if action in v2_supported_actions_list and not (self._v2_api_key or self._api_key):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, NETSKOPE_MISSING_BOTH_API_KEYS_ERR), None)
+        if action in v2_supported_actions_list and not self._v2_api_key:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Please configure 'v2 API Key' in the asset"), None)
 
         if action in only_v1_supported_actions_list and not self._api_key:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Please configure 'v1 API Key' in the asset"), None)
@@ -2001,7 +2010,7 @@ class NetskopeConnector(BaseConnector):
             self._v2_api_key = self._v2_api_key.strip()
 
         if self.get_action_identifier() in ["test_connectivity", "on_poll"] and not (self._v2_api_key or self._api_key):
-            return self.set_status(phantom.APP_ERROR, NETSKOPE_MISSING_BOTH_API_KEYS_ERR)
+            return self.set_status(phantom.APP_ERROR, NETSKOPE_MISSING_BOTH_API_KEYS_ERROR)
 
         return phantom.APP_SUCCESS
 

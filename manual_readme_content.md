@@ -68,6 +68,7 @@ ports used by the Splunk SOAR Connector.
     -   create scim group
     -   create scim user
     -   scim user group
+-   All SCIM actions now use the v2 API Token. The SCIM URL and SCIM key from the asset configuration parameter have been removed, as they are deprecated. For more information regarding the SCIM deprecation, please refer to [this link](https://docs.netskope.com/en/netskope-scim-settings/).
 -   Test Connectivity will behave as described below:
     -   If V1 API Key is configured, then the connectivity will be checked for V1 API Key
     -   If V2 API Key is configured, then the connectivity will be checked for V2 API Key

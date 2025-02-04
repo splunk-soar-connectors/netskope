@@ -82,6 +82,8 @@ ports used by the Splunk SOAR Connector.
   - /api/v2/events/data/application (Read)
   - /api/v2/policy/urllist (Read + Write)
   - /api/v2/policy/urllist/deploy (Read + Write)
+  - /api/v2/scim/Users (Read + Write)
+  - /api/v2/scim/Groups (Read + Write)
 - In Splunk SOAR, a configured file list will be created with **{list_name}\_file_list** format
   and a url list will be created with **{list_name}\_url_list** . Where, list_name is a configured
   asset parameter.

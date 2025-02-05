@@ -1424,65 +1424,64 @@ class NetskopeConnector(BaseConnector):
             if not content:
                 return action_result.set_status(phantom.APP_ERROR, "No content found to update the url list")
 
-            if self._v2_api_key:
-                # fetch the ID of the list
-                ret_val, list_id = self._get_url_list_id(action_result)
+            # fetch the ID of the list
+            ret_val, list_id = self._get_url_list_id(action_result)
 
-                if phantom.is_fail(ret_val):
-                    return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-                # fetch the data of the url list
-                url_list_endpoint = "{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, list_id)
-                request_status, request_response = self._make_rest_call(endpoint=url_list_endpoint, action_result=action_result)
+            # fetch the data of the url list
+            url_list_endpoint = "{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, list_id)
+            request_status, request_response = self._make_rest_call(endpoint=url_list_endpoint, action_result=action_result)
 
-                if phantom.is_fail(request_status):
-                    return action_result.get_status()
+            if phantom.is_fail(request_status):
+                return action_result.get_status()
 
-                # if type is missing in the response, will assign list_type as "exact" based on list url doc
-                list_type = request_response.get("data", {}).get("type", "exact")
+            # if type is missing in the response, will assign list_type as "exact" based on list url doc
+            list_type = request_response.get("data", {}).get("type", "exact")
 
-                if not list_type:
-                    self._log.error(("Failed to get the type of url list from: {0}".format(str(request_response))))
-                    return action_result.set_status(phantom.APP_ERROR, "Failed to get the type of url list")
+            if not list_type:
+                self._log.error(("Failed to get the type of url list from: {0}".format(str(request_response))))
+                return action_result.set_status(phantom.APP_ERROR, "Failed to get the type of url list")
 
-                data = {"name": self._list_name, "data": {"urls": content, "type": list_type}}
+            data = {"name": self._list_name, "data": {"urls": content, "type": list_type}}
 
-                # push the url list data to the Netskope server
-                request_status, resp_json = self._make_rest_call(
-                    endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
-                )
+            # push the url list data to the Netskope server
+            request_status, resp_json = self._make_rest_call(
+                endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
+            )
 
-                if phantom.is_fail(request_status):
-                    if resp_json.get("statusCode") == 400 and resp_json.get("message"):
-                        invalid_url_list = [item[0] for item in resp_json["message"]]
-                        self.save_progress("Removing invalid URLs from the url list.")
+            if phantom.is_fail(request_status):
+                if resp_json.get("statusCode") == 400 and resp_json.get("message"):
+                    invalid_url_list = [item[0] for item in resp_json["message"]]
+                    self.save_progress("Removing invalid URLs from the url list.")
 
-                        for item in invalid_url_list:
-                            content.remove(item)
+                    for item in invalid_url_list:
+                        content.remove(item)
 
-                        data["data"]["urls"] = content
+                    data["data"]["urls"] = content
 
-                        # push the url list data to the Netskope server
-                        request_status, _ = self._make_rest_call(
-                            endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
-                        )
+                    # push the url list data to the Netskope server
+                    request_status, _ = self._make_rest_call(
+                        endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
+                    )
 
-                        if phantom.is_fail(request_status):
-                            return action_result.get_status()
-                    else:
-                        self._log.error("failed to update {0} url_list on the Netskope".format(self._list_name))
+                    if phantom.is_fail(request_status):
                         return action_result.get_status()
-
-                self._log.info("successfully updated {0} url_list on the Netskope".format(self._list_name))
-                request_status, _ = self._make_rest_call(
-                    endpoint="{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, NETSKOPE_DEPLOY_URL_LIST),
-                    action_result=action_result,
-                    method="post",
-                )
-
-                if phantom.is_fail(request_status):
-                    self._log.error("Failed to deploy url_list changes to the Netskope")
+                else:
+                    self._log.error("failed to update {0} url_list on the Netskope".format(self._list_name))
                     return action_result.get_status()
+
+            self._log.info("successfully updated {0} url_list on the Netskope".format(self._list_name))
+            request_status, _ = self._make_rest_call(
+                endpoint="{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, NETSKOPE_DEPLOY_URL_LIST),
+                action_result=action_result,
+                method="post",
+            )
+
+            if phantom.is_fail(request_status):
+                self._log.error("Failed to deploy url_list changes to the Netskope")
+                return action_result.get_status()
 
             # removing from the phantom url list
             remove_count = 0

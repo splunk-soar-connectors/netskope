@@ -10,6 +10,7 @@ This app integrates with the Netskope to execute various investigative and polli
 
 ## Playbook Backward Compatibility
 
+- The 'displayName' output data key and 'total_users' summary key have been removed from the output data path of the 'SCIM User Group' action, as these response fields are no longer available in Netskope. Hence, it is requested that the end-user update their existing playbooks to ensure the correct functioning of playbooks created in earlier versions of the app.
 - The 'total_files' summary key has been replaced with the 'total_urls' key in output data paths
   for 'update url' action. This key will represent the total URLs updated on Netskope UI. Hence,
   it is requested to the end-user to please update their existing playbooks by re-inserting |
@@ -20,7 +21,6 @@ This app integrates with the Netskope to execute various investigative and polli
   Hence, it is requested to the end-user to please update their existing playbooks by re-inserting
   | modifying | deleting the corresponding action blocks to ensure the correct functioning of
   the playbooks created on the earlier versions of the app.
-- The 'displayName' output data key and 'total_users' summary key have been removed from the output data path of the 'SCIM User Group' action, as these response fields are no longer available in Netskope. Hence, it is requested that the end-user update their existing playbooks to ensure the correct functioning of playbooks created in earlier versions of the app.
 
 ## Port Details
 

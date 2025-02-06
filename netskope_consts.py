@@ -13,15 +13,10 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 NETSKOPE_CONFIG_SERVER_URL = "server_url"
-NETSKOPE_CONFIG_SCIM_URL = "scim_url"
 NETSKOPE_CONFIG_API_KEY = "api_key"  # pragma: allowlist secret
-NETSKOPE_CONFIG_SCIM_KEY = "scim_key"
 NETSKOPE_CONFIG_V2_API_KEY = "v2_api_key"  # pragma: allowlist secret
 NETSKOPE_CONNECTIVITY_ENDPOINT = "/api/v1/clients"
 NETSKOPE_QUARANTINE_ENDPOINT = "/api/v1/quarantine"
-NETSKOPE_ON_POLL_ENDPOINT = "/api/v1/alerts"
-NETSKOPE_EVENTS_ENDPOINT = "/api/v1/events"
-NETSKOPE_URL_LIST_ENDPOINT = "/api/v1/updateUrlList"
 NETSKOPE_FILE_LIST_ENDPOINT = "/api/v1/updateFileHashList"
 NETSKOPE_V2_EVENT_ENDPOINT = "/api/v2/events/data"
 NETSKOPE_PAGE_EVENT = "page"
@@ -29,9 +24,8 @@ NETSKOPE_APPLICATION_EVENT = "application"
 NETSKOPE_ALERT_EVENT = "alert"
 NETSKOPE_V2_URL_LIST_ENDPOINT = "/api/v2/policy/urllist"
 NETSKOPE_DEPLOY_URL_LIST = "deploy"
-NETSKOPE_SCIM_USERS_ENDPOINT = "/Users"
-NETSKOPE_SCIM_GROUPS_ENDPOINT = "/Groups"
-NETSKOPE_SCIM_GROUP_ENDPOINT = "/Group"
+NETSKOPE_SCIM_USERS_ENDPOINT = "/scim/Users"
+NETSKOPE_SCIM_GROUPS_ENDPOINT = "/scim/Groups"
 NETSKOPE_V2_API_PREFIX = "/api/v2"
 NETSKOPE_PARAM_LIST_FILES = "get-files"
 NETSKOPE_PARAM_IP = "ip"

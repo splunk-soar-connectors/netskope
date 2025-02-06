@@ -55,7 +55,6 @@ class NetskopeConnector(BaseConnector):
         self._v2_api_key = None
         self._tenant = None
         self._list_name = None
-        self._scim = {"url": "", "token": ""}
         kl = KennyLoggins()
         self._log = kl.get_logger(app_name="phnetskope", file_name="connector", log_level=logging.DEBUG, version="3.0.0")
         self._log.info("initialize_client=complete")
@@ -116,6 +115,9 @@ class NetskopeConnector(BaseConnector):
         """
         status_code = response.status_code
         try:
+            if response.ok:
+                return RetVal(phantom.APP_SUCCESS, {})
+
             soup = BeautifulSoup(response.text, "html.parser")
             # Remove the script, style, footer and navigation part from the HTML message
             for element in soup(["script", "style", "footer", "nav"]):
@@ -225,42 +227,14 @@ class NetskopeConnector(BaseConnector):
             config = self.get_config()
             self._log.info("config={0} params={1} timeout={2}".format(config, params, timeout))
 
-            if config.get(NETSKOPE_CONFIG_SCIM_URL) and config.get(NETSKOPE_CONFIG_SCIM_KEY):
-                try:
-                    self._scim["url"] = config.get(NETSKOPE_CONFIG_SCIM_URL).strip("/")
-                    self._scim["token"] = config.get(NETSKOPE_CONFIG_SCIM_KEY)
-                except Exception as e:
-                    error_message = self._get_error_message_from_exception(e)
-                    self.error_print("Error while encoding server URL")
-                    return RetVal(
-                        action_result.set_status(
-                            phantom.APP_ERROR,
-                            (
-                                "Error while encoding server \
-                                   URL: {0}"
-                            ).format(error_message),
-                        ),
-                        resp_json,
-                    )
-            else:
-                self.debug_print("Please configure both 'SCIM Server URL' and 'SCIM Token' in asset settings to execute this action")
-                return RetVal(
-                    action_result.set_status(
-                        phantom.APP_ERROR,
-                        "Please configure both 'SCIM Server URL' and 'SCIM Token' \
-                               in asset settings to execute this action",
-                    ),
-                    resp_json,
-                )
-
             try:
                 request_func = getattr(requests, method)
             except AttributeError:
                 self._log.error("action=failed invalid_method={0}".format(method))
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
-
-            url = "{server_url}{endpoint}".format(server_url=self._scim["url"], endpoint=endpoint)
-            headers = {"Authorization": "Bearer {0}".format(self._scim["token"])}
+            self._server_url = config[NETSKOPE_CONFIG_SERVER_URL].strip("/")
+            url = "{server_url}{version}{endpoint}".format(server_url=self._server_url, version=NETSKOPE_V2_API_PREFIX, endpoint=endpoint)
+            headers = {"Authorization": "Bearer {0}".format(self._v2_api_key)}
             if method == "post" or method == "patch":
                 headers["Content-Type"] = "application/scim+json"
 
@@ -315,11 +289,20 @@ class NetskopeConnector(BaseConnector):
         response obtained by making an API call
         """
         action = self.get_action_identifier()
-        v2_supported_actions_list = ["run_query", "update_url_list"]
+        v2_supported_actions_list = [
+            "run_query",
+            "update_url_list",
+            "on_poll",
+            "get_scim_users",
+            "get_scim_groups",
+            "create_scim_group",
+            "create_scim_user",
+            "scim_user_to_group",
+        ]
         only_v1_supported_actions_list = ["list_files", "get_file", "update_file_list"]
 
-        if action in v2_supported_actions_list and not (self._v2_api_key or self._api_key):
-            return RetVal(action_result.set_status(phantom.APP_ERROR, NETSKOPE_MISSING_BOTH_API_KEYS_ERR), None)
+        if action in v2_supported_actions_list and not self._v2_api_key:
+            return RetVal(action_result.set_status(phantom.APP_ERROR, "Please configure 'v2 API Key' in the asset"), None)
 
         if action in only_v1_supported_actions_list and not self._api_key:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Please configure 'v1 API Key' in the asset"), None)
@@ -647,8 +630,6 @@ class NetskopeConnector(BaseConnector):
 
         params = {"query": NETSKOPE_QUERY_PARAM.format(srcip=ip, dstip=ip)}
 
-        if not self._v2_api_key:
-            params.update({"type": "page"})
         time_status, time_response = self._verify_time(start_time, end_time)
 
         if phantom.is_fail(time_status):
@@ -657,9 +638,7 @@ class NetskopeConnector(BaseConnector):
         params.update({"starttime": start_time, "endtime": end_time})
         event_details = {}
         page_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_PAGE_EVENT)
-        ret_val, page_event_list = self._get_events(
-            endpoint=page_event_endpoint if self._v2_api_key else NETSKOPE_EVENTS_ENDPOINT, action_result=action_result, params=params
-        )
+        ret_val, page_event_list = self._get_events(endpoint=page_event_endpoint, action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Failed to get 'page' events. Error: {0}".format(action_result.get_message()))
@@ -667,13 +646,8 @@ class NetskopeConnector(BaseConnector):
         if page_event_list:
             event_details["page"] = page_event_list
 
-        if not self._v2_api_key:
-            params.update({"type": "application"})
-
         application_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_APPLICATION_EVENT)
-        ret_val, application_event_list = self._get_events(
-            endpoint=application_event_endpoint if self._v2_api_key else NETSKOPE_EVENTS_ENDPOINT, action_result=action_result, params=params
-        )
+        ret_val, application_event_list = self._get_events(endpoint=application_event_endpoint, action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(
@@ -712,11 +686,11 @@ class NetskopeConnector(BaseConnector):
             start_time = self._state.get("last_ingestion_time", end_time - NETSKOPE_24_HOUR_GAP)
 
         self._log.info("action=get_poll start_time={0} end_time={1} container_count={2}".format(start_time, end_time, container_count))
-        self.save_progress("Getting alerts data using {0} API key".format("v2" if self._v2_api_key else "v1"))
+        self.save_progress("Getting alerts data using v2 API key")
         request_params = {"starttime": start_time, "endtime": end_time}
         alert_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_ALERT_EVENT)
         response_status, alerts_list = self._get_events(
-            endpoint=alert_event_endpoint if self._v2_api_key else NETSKOPE_ON_POLL_ENDPOINT,
+            endpoint=alert_event_endpoint,
             action_result=action_result,
             params=request_params,
             max_limit=container_count,
@@ -1450,74 +1424,70 @@ class NetskopeConnector(BaseConnector):
             if not content:
                 return action_result.set_status(phantom.APP_ERROR, "No content found to update the url list")
 
-            if self._v2_api_key:
-                # fetch the ID of the list
-                ret_val, list_id = self._get_url_list_id(action_result)
+            # fetch the ID of the list
+            ret_val, list_id = self._get_url_list_id(action_result)
 
-                if phantom.is_fail(ret_val):
-                    return action_result.get_status()
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
-                # fetch the data of the url list
-                url_list_endpoint = "{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, list_id)
-                request_status, request_response = self._make_rest_call(endpoint=url_list_endpoint, action_result=action_result)
+            # fetch the data of the url list
+            url_list_endpoint = "{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, list_id)
+            request_status, request_response = self._make_rest_call(endpoint=url_list_endpoint, action_result=action_result)
 
-                if phantom.is_fail(request_status):
-                    return action_result.get_status()
+            if phantom.is_fail(request_status):
+                return action_result.get_status()
 
-                # if type is missing in the response, will assign list_type as "exact" based on list url doc
-                list_type = request_response.get("data", {}).get("type", "exact")
+            # if type is missing in the response, will assign list_type as "exact" based on list url doc
+            list_type = request_response.get("data", {}).get("type", "exact")
 
-                if not list_type:
-                    self._log.error(("Failed to get the type of url list from: {0}".format(str(request_response))))
-                    return action_result.set_status(phantom.APP_ERROR, "Failed to get the type of url list")
+            if not list_type:
+                self._log.error(("Failed to get the type of url list from: {0}".format(str(request_response))))
+                return action_result.set_status(phantom.APP_ERROR, "Failed to get the type of url list")
 
-                data = {"name": self._list_name, "data": {"urls": content, "type": list_type}}
+            data = {"name": self._list_name, "data": {"urls": content, "type": list_type}}
 
-                # push the url list data to the Netskope server
-                request_status, resp_json = self._make_rest_call(
-                    endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
-                )
+            # push the url list data to the Netskope server
+            request_status, resp_json = self._make_rest_call(
+                endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
+            )
 
-                if phantom.is_fail(request_status):
-                    if resp_json.get("statusCode") == 400 and resp_json.get("message"):
-                        invalid_url_list = [item[0] for item in resp_json["message"]]
-                        self.save_progress("Removing invalid URLs from the url list.")
+            if phantom.is_fail(request_status):
+                is_json = False
+                try:
+                    json.loads(resp_json)
+                    is_json = True
+                except:
+                    is_json = False
+                if is_json and resp_json.get("statusCode") == 400 and resp_json.get("message"):
+                    invalid_url_list = [item[0] for item in resp_json["message"]]
+                    self.save_progress("Removing invalid URLs from the url list.")
 
-                        for item in invalid_url_list:
-                            content.remove(item)
+                    for item in invalid_url_list:
+                        content.remove(item)
 
-                        data["data"]["urls"] = content
+                    data["data"]["urls"] = content
 
-                        # push the url list data to the Netskope server
-                        request_status, _ = self._make_rest_call(
-                            endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
-                        )
+                    # push the url list data to the Netskope server
+                    request_status, _ = self._make_rest_call(
+                        endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
+                    )
 
-                        if phantom.is_fail(request_status):
-                            return action_result.get_status()
-                    else:
-                        self._log.error("failed to update {0} url_list on the Netskope".format(self._list_name))
+                    if phantom.is_fail(request_status):
                         return action_result.get_status()
-
-                self._log.info("successfully updated {0} url_list on the Netskope".format(self._list_name))
-                request_status, _ = self._make_rest_call(
-                    endpoint="{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, NETSKOPE_DEPLOY_URL_LIST),
-                    action_result=action_result,
-                    method="post",
-                )
-
-                if phantom.is_fail(request_status):
-                    self._log.error("Failed to deploy url_list changes to the Netskope")
+                else:
+                    self._log.error("failed to update {0} url_list on the Netskope".format(self._list_name))
                     return action_result.get_status()
-            else:
-                params = {"list": ",".join(content), "name": self._list_name}
-                self._log.info("action=get_url_list exists={0} message={1} content_length={2}".format(exists, message, len(content)))
 
-                # deploy pushed changes
-                request_status, _ = self._make_rest_call(endpoint=NETSKOPE_URL_LIST_ENDPOINT, action_result=action_result, params=params)
+            self._log.info("successfully updated {0} url_list on the Netskope".format(self._list_name))
+            request_status, _ = self._make_rest_call(
+                endpoint="{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, NETSKOPE_DEPLOY_URL_LIST),
+                action_result=action_result,
+                method="post",
+            )
 
-                if phantom.is_fail(request_status):
-                    return action_result.get_status()
+            if phantom.is_fail(request_status):
+                self._log.error("Failed to deploy url_list changes to the Netskope")
+                return action_result.get_status()
 
             # removing from the phantom url list
             remove_count = 0
@@ -1710,11 +1680,12 @@ class NetskopeConnector(BaseConnector):
                 self._log.error("action=failed status={0} response={1}".format(request_status, request_response))
                 return action_result.get_status()
 
-            resources = request_response.get("Resources", [])
-            [action_result.add_data(x) for x in resources]
-            summary = action_result.update_summary({})
-            summary["total_users"] = len(resources)
-            return action_result.set_status(phantom.APP_SUCCESS)
+            return action_result.set_status(
+                phantom.APP_SUCCESS,
+                "Successfully {0}ed user={1} in group={2}.".format(
+                    param.get("action", "add"), param[NETSKOPE_PARAM_USER], param[NETSKOPE_PARAM_GROUP]
+                ),
+            )
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
@@ -2018,10 +1989,6 @@ class NetskopeConnector(BaseConnector):
         config = self.get_config()
         self._file_list = "{0}_{1}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_FILE_LIST)
         self._url_list = "{0}_{1}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_URL_LIST)
-
-        self._scim["url"] = config.get("scim_url", "")
-        self._scim["token"] = config.get("scim_key", "")
-
         list_status, message, list_contents = self.get_url_list()
         self._log.info("action=get_url_list status={0} message={1} contents_length={2}".format(list_status, message, len(list_contents)))
 
@@ -2048,7 +2015,7 @@ class NetskopeConnector(BaseConnector):
             self._v2_api_key = self._v2_api_key.strip()
 
         if self.get_action_identifier() in ["test_connectivity", "on_poll"] and not (self._v2_api_key or self._api_key):
-            return self.set_status(phantom.APP_ERROR, NETSKOPE_MISSING_BOTH_API_KEYS_ERR)
+            return self.set_status(phantom.APP_ERROR, NETSKOPE_MISSING_BOTH_API_KEYS_ERROR)
 
         return phantom.APP_SUCCESS
 

@@ -14,6 +14,7 @@
 [comment]: # ""
 ## Playbook Backward Compatibility
 
+-   The 'displayName' output data key and 'total_users' summary key have been removed from the output data path of the 'SCIM User Group' action, as these response fields are no longer available in Netskope. Hence, it is requested that the end-user update their existing playbooks to ensure the correct functioning of playbooks created in earlier versions of the app.
 -   The 'total_files' summary key has been replaced with the 'total_urls' key in output data paths
     for 'update url' action. This key will represent the total URLs updated on Netskope UI. Hence,
     it is requested to the end-user to please update their existing playbooks by re-inserting |
@@ -54,24 +55,26 @@ ports used by the Splunk SOAR Connector.
 <div id="action-notes" class="section">
 
 ## Action Notes
-
--   Below actions will use V2 REST API
-    [endpoints](https://docs.netskope.com/en/rest-api-v2-overview-312207.html) if **V2 API Key** is
-    configured in the asset. Actions will continue to support V1 API Key if V2 API Key is not
-    provided, but it is recommended to use V2 API Key.
+-   Below actions will continue to use V1 API endpoints so without configuring **V1 API Key** below actions will fail.
+    -   update hash
+    -   list files
+    -   get file
+-   Below actions will use V2 REST API endpoints. It is mandatory to configure the V2 API Key in the asset. Actions will fail without a V2 API Key.
+    [endpoints](https://docs.netskope.com/en/rest-api-v2-overview-312207.html)
     -   run query
     -   update url
     -   on poll
+    -   get scim users
+    -   get scim groups
+    -   create scim group
+    -   create scim user
+    -   scim user group
+-   All SCIM actions now use the v2 API Token. The SCIM URL and SCIM key from the asset configuration parameter have been removed, as they are deprecated. For more information regarding the SCIM deprecation, please refer to [this link](https://docs.netskope.com/en/netskope-scim-settings/).
 -   Test Connectivity will behave as described below:
     -   If V1 API Key is configured, then the connectivity will be checked for V1 API Key
     -   If V2 API Key is configured, then the connectivity will be checked for V2 API Key
     -   If both are configured then the connectivity will be checked with both API Keys
     -   If none is provided then the message will be thrown to configure at least one
--   Below actions will continue to use V1 API endpoints so without configuring **V1 API Key** below
-    actions will fail.
-    -   update hash
-    -   list files
-    -   get file
 -   Actions listed below just update the Splunk SOAR list and do not make any REST calls to the
     Netskope, so they'll work without any API Key.
     -   add url
@@ -85,6 +88,8 @@ ports used by the Splunk SOAR Connector.
     -   /api/v2/events/data/application (Read)
     -   /api/v2/policy/urllist (Read + Write)
     -   /api/v2/policy/urllist/deploy (Read + Write)
+    -   /api/v2/scim/Users (Read + Write)
+    -   /api/v2/scim/Groups (Read + Write)
 -   In Splunk SOAR, a configured file list will be created with **{list_name}\_file_list** format
     and a url list will be created with **{list_name}\_url_list** . Where, list_name is a configured
     asset parameter.

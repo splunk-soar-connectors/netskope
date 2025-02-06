@@ -10,7 +10,7 @@
     "product_version_regex": ".*",
     "publisher": "Netskope",
     "license": "Copyright 2018-2025 Netskope, Inc.",
-    "app_version": "3.1.1",
+    "app_version": "4.0.0",
     "utctime_updated": "2025-01-21T06:53:29.000000Z",
     "package_name": "phantom_netskope",
     "main_module": "netskope_connector.py",
@@ -33,26 +33,16 @@
             "data_type": "password",
             "order": 1
         },
-        "scim_url": {
-            "description": "SCIM Server URL",
-            "data_type": "string",
-            "order": 2
-        },
-        "scim_key": {
-            "description": "SCIM Token",
-            "data_type": "password",
-            "order": 3
-        },
         "list_name": {
             "description": "Netskope List Name (both URL and file hash)",
             "data_type": "string",
-            "order": 4,
+            "order": 2,
             "default": "phantom_list"
         },
         "api_key": {
             "description": "V1 API Key",
             "data_type": "password",
-            "order": 5
+            "order": 3
         }
     },
     "actions": [
@@ -334,7 +324,7 @@
         {
             "action": "get scim groups",
             "identifier": "get_scim_groups",
-            "description": "Get current SCIM group(s). If no parameter is sent, it will retrieve all users",
+            "description": "Get current SCIM group(s). If no parameter is sent, it will retrieve all groups",
             "type": "investigate",
             "read_only": true,
             "parameters": {
@@ -767,22 +757,6 @@
                     "example_values": [
                         "test@gmail.com",
                         "6f1209b4-a3c0-4266-a53b-0f0858480ed6"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.displayName",
-                    "data_type": "string",
-                    "contains": [
-                        "netskope group name"
-                    ],
-                    "column_name": "Group Name",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.summary.total_users",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1
                     ]
                 },
                 {
@@ -2781,7 +2755,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Total files: 2, Remove msg: Removed 1 instances of \"ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad\" from \"test_list_netskope_file_list\""
+                        "Total files: 2, Remove msg: Removed 1 instances of \"testxxxba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015adxxxtest\" from \"test_list_netskope_file_list\""
                     ]
                 },
                 {

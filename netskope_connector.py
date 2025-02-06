@@ -1452,7 +1452,13 @@ class NetskopeConnector(BaseConnector):
             )
 
             if phantom.is_fail(request_status):
-                if resp_json.get("statusCode") == 400 and resp_json.get("message"):
+                is_json = False
+                try:
+                    json.loads(resp_json)
+                    is_json = True
+                except:
+                    is_json = False
+                if is_json and resp_json.get("statusCode") == 400 and resp_json.get("message"):
                     invalid_url_list = [item[0] for item in resp_json["message"]]
                     self.save_progress("Removing invalid URLs from the url list.")
 

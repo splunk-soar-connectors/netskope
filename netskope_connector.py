@@ -46,7 +46,7 @@ class NetskopeConnector(BaseConnector):
 
     def __init__(self):
         """Construct an instance of the connector class"""
-        super(NetskopeConnector, self).__init__()
+        super().__init__()
         self._state = None
         self._file_list = NETSKOPE_FILE_LIST
         self._url_list = NETSKOPE_URL_LIST
@@ -81,7 +81,7 @@ class NetskopeConnector(BaseConnector):
         except Exception as ex:
             self._dump_error_log(ex, "Error occurred while retrieving exception information")
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_message)
+        return f"Error Code: {error_code}. Error Message: {error_message}"
 
     @staticmethod
     def _process_empty_response(response, action_result):
@@ -98,9 +98,9 @@ class NetskopeConnector(BaseConnector):
                 action_result.set_status(
                     phantom.APP_ERROR,
                     (
-                        "Empty response and no information in the header. \
-                           Status Code: {0}"
-                    ).format(response.status_code),
+                        f"Empty response and no information in the header. \
+                           Status Code: {response.status_code}"
+                    ),
                 ),
                 None,
             )
@@ -129,7 +129,7 @@ class NetskopeConnector(BaseConnector):
         except Exception:
             error_text = "Cannot parse error details"
 
-        message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, error_text)
+        message = f"Status Code: {status_code}. Data from server:\n{error_text}\n"
         message = message.replace("{", "{{").replace("}", "}}")
         if len(message) > 500:
             message = NETSKOPE_ERROR_CONNECTING_SERVER
@@ -147,7 +147,7 @@ class NetskopeConnector(BaseConnector):
         except Exception as e:
             return RetVal(
                 action_result.set_status(
-                    phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".format(self._get_error_message_from_exception(e))
+                    phantom.APP_ERROR, f"Unable to parse JSON response. Error: {self._get_error_message_from_exception(e)}"
                 ),
                 None,
             )
@@ -159,7 +159,7 @@ class NetskopeConnector(BaseConnector):
             elif resp_json.get("errors"):
                 error_message = resp_json["errors"]
 
-            message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
+            message = f"Error from server. Status Code: {response.status_code} Data from server: {error_message}"
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         else:
             if 200 <= response.status_code < 399:
@@ -181,7 +181,7 @@ class NetskopeConnector(BaseConnector):
         try:
             if hasattr(action_result, "add_debug_data") and (
                 self.get_action_identifier() != "get_file" or not 200 <= response.status_code < 399
-            ):  # noqa: E501
+            ):
                 action_result.add_debug_data({"r_status_code": response.status_code})
                 action_result.add_debug_data({"r_text": response.text})
                 action_result.add_debug_data({"r_headers": response.headers})
@@ -199,14 +199,14 @@ class NetskopeConnector(BaseConnector):
                 return self._process_empty_response(response, action_result)
 
             error_message = response.text.replace("{", "{{").replace("}", "}}")
-            message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(response.status_code, error_message)
+            message = f"Can't process response from server. Status Code: {response.status_code} Data from server: {error_message}"
             self._log.error(message)
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.info("exception_line={0} {1}".format(exc_tb.tb_lineno, error_message))
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Error: {0}".format(error_message)), None)
+            self._log.info(f"exception_line={exc_tb.tb_lineno} {error_message}")
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error: {error_message}"), None)
 
     def _make_scim_rest_call(self, endpoint, action_result, params=None, timeout=60, method="get"):
         """Make the SCIM REST call to the app.
@@ -225,26 +225,24 @@ class NetskopeConnector(BaseConnector):
                 params = {}
 
             config = self.get_config()
-            self._log.info("config={0} params={1} timeout={2}".format(config, params, timeout))
+            self._log.info(f"config={config} params={params} timeout={timeout}")
 
             try:
                 request_func = getattr(requests, method)
             except AttributeError:
-                self._log.error("action=failed invalid_method={0}".format(method))
-                return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+                self._log.error(f"action=failed invalid_method={method}")
+                return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
             self._server_url = config[NETSKOPE_CONFIG_SERVER_URL].strip("/")
-            url = "{server_url}{version}{endpoint}".format(server_url=self._server_url, version=NETSKOPE_V2_API_PREFIX, endpoint=endpoint)
-            headers = {"Authorization": "Bearer {0}".format(self._v2_api_key)}
+            url = f"{self._server_url}{NETSKOPE_V2_API_PREFIX}{endpoint}"
+            headers = {"Authorization": f"Bearer {self._v2_api_key}"}
             if method == "post" or method == "patch":
                 headers["Content-Type"] = "application/scim+json"
 
             self._log.info(
-                "action=make_scim_rest method={0} url={1} params={2} \
-                             function={3}".format(
-                    method, url, json.dumps(params), request_func
-                )
+                f"action=make_scim_rest method={method} url={url} params={json.dumps(params)} \
+                             function={request_func}"
             )
-            temp_file_path = "{dir}{asset}_temp_file".format(dir=self.get_state_dir(), asset=self.get_asset_id())
+            temp_file_path = f"{self.get_state_dir()}{self.get_asset_id()}_temp_file"
 
             try:
                 if method == "get":
@@ -252,7 +250,7 @@ class NetskopeConnector(BaseConnector):
                 else:
                     requests_response = request_func(url, headers=headers, data=json.dumps(params), timeout=timeout)
             except requests.exceptions.InvalidURL:
-                e = "Error connecting to server. Invalid URL {0}".format(url)
+                e = f"Error connecting to server. Invalid URL {url}"
                 return RetVal(action_result.set_status(phantom.APP_ERROR, e), resp_json)
             except Exception as e:
                 error_message = self._get_error_message_from_exception(e)
@@ -260,20 +258,20 @@ class NetskopeConnector(BaseConnector):
                 if os.path.exists(temp_file_path):
                     os.remove(temp_file_path)
 
-                self._log.error("action=failed exception={0}".format(error_message))
-                message = "Error connecting to server. Details: {0}".format(error_message)
+                self._log.error(f"action=failed exception={error_message}")
+                message = f"Error connecting to server. Details: {error_message}"
                 if "token=" in e:
                     message = "Error while connecting to the server"
 
-                self._log.info("action=failed response={0}".format(resp_json))
+                self._log.info(f"action=failed response={resp_json}")
                 return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
 
-            self._log.info("action=returning_success result={0} response={1}".format(action_result, requests_response))
+            self._log.info(f"action=returning_success result={action_result} response={requests_response}")
             return self._process_response(requests_response, action_result)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.info("exception_line={0} {1}".format(exc_tb.tb_lineno, error_message))
+            self._log.info(f"exception_line={exc_tb.tb_lineno} {error_message}")
             return self._process_response(requests_response, action_result)
 
     def _make_rest_call(self, endpoint, action_result, method="get", params=None, data=None, timeout=None):
@@ -316,16 +314,14 @@ class NetskopeConnector(BaseConnector):
         try:
             self._server_url = config[NETSKOPE_CONFIG_SERVER_URL].strip("/")
             self._tenant = self._server_url.split("//")[1]
-            self._log.info("tenant={0}".format(self._tenant))
+            self._log.info(f"tenant={self._tenant}")
         except Exception as ex:
             self.error_print("Error while initializing server URL and basic connection parameters from the asset configuration")
             return RetVal(
                 action_result.set_status(
                     phantom.APP_ERROR,
-                    "Error while initializing server URL and basic \
-                           connection parameters from the asset configuration, Error: {}".format(
-                        self._get_error_message_from_exception(ex)
-                    ),
+                    f"Error while initializing server URL and basic \
+                           connection parameters from the asset configuration, Error: {self._get_error_message_from_exception(ex)}",
                 ),
                 resp_json,
             )
@@ -340,11 +336,11 @@ class NetskopeConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, "Invalid method: {0}".format(method)), resp_json)
+            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
-        url = "{server_url}{endpoint}".format(server_url=self._server_url, endpoint=endpoint)
-        self._log.info("action=make_rest url={0} params={1}".format(url, json.dumps(params)))
-        temp_file_path = "{dir}{asset}_temp_file".format(dir=self.get_state_dir(), asset=self.get_asset_id())
+        url = f"{self._server_url}{endpoint}"
+        self._log.info(f"action=make_rest url={url} params={json.dumps(params)}")
+        temp_file_path = f"{self.get_state_dir()}{self.get_asset_id()}_temp_file"
 
         try:
             # for the get_file action fetch the file data in stream and store the same in the Splunk SOAR
@@ -366,10 +362,10 @@ class NetskopeConnector(BaseConnector):
                 requests_response = request_func(url, headers=headers, params=params, timeout=timeout)
         except requests.exceptions.ConnectionError as e:
             error_message = self._get_error_message_from_exception(e)
-            message = "Error Details: Connection Refused from the Server. {0}".format(error_message)
+            message = f"Error Details: Connection Refused from the Server. {error_message}"
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)
         except requests.exceptions.InvalidURL:
-            e = "Error connecting to server. Invalid URL {0}".format(url)
+            e = f"Error connecting to server. Invalid URL {url}"
             return RetVal(action_result.set_status(phantom.APP_ERROR, e), resp_json)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
@@ -377,7 +373,7 @@ class NetskopeConnector(BaseConnector):
             if os.path.exists(temp_file_path):
                 os.remove(temp_file_path)
 
-            message = "Error connecting to server. Details: {0}".format(error_message)
+            message = f"Error connecting to server. Details: {error_message}"
             if "token=" in e:
                 message = "Error while connecting to the server"
 
@@ -414,7 +410,7 @@ class NetskopeConnector(BaseConnector):
             current_time = int(time.time())
             request_param.update({"starttime": current_time - NETSKOPE_24_HOUR_GAP, "endtime": current_time})
             ret_val, _ = self._make_rest_call(
-                endpoint="{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_PAGE_EVENT),
+                endpoint=f"{NETSKOPE_V2_EVENT_ENDPOINT}/{NETSKOPE_PAGE_EVENT}",
                 action_result=action_result,
                 params=request_param,
                 timeout=30,
@@ -452,7 +448,7 @@ class NetskopeConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        temp_file_path = "{dir}{asset}_temp_file".format(dir=self.get_state_dir(), asset=self.get_asset_id())
+        temp_file_path = f"{self.get_state_dir()}{self.get_asset_id()}_temp_file"
         generate_file_hash_status, file_hash = self._generate_file_hash(file_path=temp_file_path)
 
         if phantom.is_fail(generate_file_hash_status):
@@ -481,7 +477,7 @@ class NetskopeConnector(BaseConnector):
         except Exception as ex:
             return action_result.set_status(
                 phantom.APP_ERROR,
-                "Error occurred while fetching the vault details, Error: {}".format(self._get_error_message_from_exception(ex)),
+                f"Error occurred while fetching the vault details, Error: {self._get_error_message_from_exception(ex)}",
             )
 
         action_result.add_data({"vault_id": vault_id, "file_name": file_name})
@@ -514,7 +510,7 @@ class NetskopeConnector(BaseConnector):
                 profile_id_match = item.get("quarantine_profile_id", "").lower() == profile_param.lower()
                 profile_name_match = item.get("quarantine_profile_name", "").lower() == profile_param.lower()
 
-                if profile_id_match or profile_name_match:  # noqa: E501
+                if profile_id_match or profile_name_match:
                     profile_id = item["quarantine_profile_id"]
                     for file_item in item.get("files", []):
                         if file_item["file_id"] == file_param or file_item["quarantined_file_name"].lower() == file_param.lower():
@@ -637,25 +633,25 @@ class NetskopeConnector(BaseConnector):
 
         params.update({"starttime": start_time, "endtime": end_time})
         event_details = {}
-        page_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_PAGE_EVENT)
+        page_event_endpoint = f"{NETSKOPE_V2_EVENT_ENDPOINT}/{NETSKOPE_PAGE_EVENT}"
         ret_val, page_event_list = self._get_events(endpoint=page_event_endpoint, action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to get 'page' events. Error: {0}".format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, f"Failed to get 'page' events. Error: {action_result.get_message()}")
 
         if page_event_list:
             event_details["page"] = page_event_list
 
-        application_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_APPLICATION_EVENT)
+        application_event_endpoint = f"{NETSKOPE_V2_EVENT_ENDPOINT}/{NETSKOPE_APPLICATION_EVENT}"
         ret_val, application_event_list = self._get_events(endpoint=application_event_endpoint, action_result=action_result, params=params)
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(
                 phantom.APP_ERROR,
                 (
-                    "Failed to get 'application' events. \
-                                                                Error: {0}"
-                ).format(action_result.get_message()),
+                    f"Failed to get 'application' events. \
+                                                                Error: {action_result.get_message()}"
+                ),
             )
 
         if application_event_list:
@@ -685,10 +681,10 @@ class NetskopeConnector(BaseConnector):
         else:
             start_time = self._state.get("last_ingestion_time", end_time - NETSKOPE_24_HOUR_GAP)
 
-        self._log.info("action=get_poll start_time={0} end_time={1} container_count={2}".format(start_time, end_time, container_count))
+        self._log.info(f"action=get_poll start_time={start_time} end_time={end_time} container_count={container_count}")
         self.save_progress("Getting alerts data using v2 API key")
         request_params = {"starttime": start_time, "endtime": end_time}
-        alert_event_endpoint = "{0}/{1}".format(NETSKOPE_V2_EVENT_ENDPOINT, NETSKOPE_ALERT_EVENT)
+        alert_event_endpoint = f"{NETSKOPE_V2_EVENT_ENDPOINT}/{NETSKOPE_ALERT_EVENT}"
         response_status, alerts_list = self._get_events(
             endpoint=alert_event_endpoint,
             action_result=action_result,
@@ -711,11 +707,7 @@ class NetskopeConnector(BaseConnector):
 
             artifacts_creation_status, artifacts_creation_message = self._create_artifacts(alert=alert, container_id=container_id)
             if phantom.is_fail(artifacts_creation_status):
-                self.debug_print(
-                    "Error while creating artifacts for container with ID {container_id}. {error_message}".format(
-                        container_id=container_id, error_message=artifacts_creation_message
-                    )
-                )
+                self.debug_print(f"Error while creating artifacts for container with ID {container_id}. {artifacts_creation_message}")
 
         self._state["first_run"] = False
         self._state["last_ingestion_time"] = end_time
@@ -773,9 +765,9 @@ class NetskopeConnector(BaseConnector):
         :return: container_id
         """
         container_dict = dict()
-        self._log.info("alert={0}".format(json.dumps(alert)))
+        self._log.info(f"alert={json.dumps(alert)}")
         container_dict["name"] = "{alert_name}-{id}-{type}".format(
-            alert_name=alert["alert_name"], id=alert.get("_id", "unk-{0}".format(uuid.uuid4())), type=alert.get("alert_type", "unknown")
+            alert_name=alert["alert_name"], id=alert.get("_id", f"unk-{uuid.uuid4()}"), type=alert.get("alert_type", "unknown")
         )
         container_dict["source_data_identifier"] = container_dict["name"]
         container_dict["start_time"] = "{time}Z".format(time=datetime.utcfromtimestamp(alert["timestamp"]).isoformat())
@@ -785,7 +777,7 @@ class NetskopeConnector(BaseConnector):
             "activity": alert.get("activity"),
             "type": alert.get("type"),
         }
-        container_dict["tags"] = ["{0}={1}".format(x, possible_tags[x]) for x in possible_tags if possible_tags[x] is not None]
+        container_dict["tags"] = [f"{x}={possible_tags[x]}" for x in possible_tags if possible_tags[x] is not None]
         container_creation_status, container_creation_message, container_id = self.save_container(container=container_dict)
 
         if phantom.is_fail(container_creation_status):
@@ -806,7 +798,7 @@ class NetskopeConnector(BaseConnector):
         :return: status(success/failure), message
         """
         artifacts_list = []
-        self._log.info("action=create_artifacts tenant={0} artifact={1}".format(self._tenant, json.dumps(alert)))
+        self._log.info(f"action=create_artifacts tenant={self._tenant} artifact={json.dumps(alert)}")
         artifacts_mapping = {
             "IP Artifact": {
                 "managementID": ("managementID", []),
@@ -1322,7 +1314,7 @@ class NetskopeConnector(BaseConnector):
             temp_dict = {}
             cef = {}
             cef_types = {}
-            self._log.info("artifact_name={0}".format(artifact_name))
+            self._log.info(f"artifact_name={artifact_name}")
 
             if artifact_name == "URL Artifact" and not phantom.is_url(alert.get("url", "")) and "url" in alert:
                 alert["domain"] = self._get_domain_from_url(alert.get("url", ""))
@@ -1347,11 +1339,11 @@ class NetskopeConnector(BaseConnector):
 
         al_ty = alert.get("alert_type", "unknown").lower()
         if al_ty in specific_alert_mapping:
-            self._log.info("action=specific_artifact alert={0}".format(al_ty))
+            self._log.info(f"action=specific_artifact alert={al_ty}")
             temp_dict = {}
             cef = {}
             cef_types = {}
-            artifact_name = "{0} Artifact".format(alert.get("alert_type"))
+            artifact_name = "{} Artifact".format(alert.get("alert_type"))
 
             for artifact_key, artifact_tuple in specific_alert_mapping.get(al_ty).items():
                 if alert.get(artifact_tuple[0]):
@@ -1431,7 +1423,7 @@ class NetskopeConnector(BaseConnector):
                 return action_result.get_status()
 
             # fetch the data of the url list
-            url_list_endpoint = "{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, list_id)
+            url_list_endpoint = f"{NETSKOPE_V2_URL_LIST_ENDPOINT}/{list_id}"
             request_status, request_response = self._make_rest_call(endpoint=url_list_endpoint, action_result=action_result)
 
             if phantom.is_fail(request_status):
@@ -1441,14 +1433,14 @@ class NetskopeConnector(BaseConnector):
             list_type = request_response.get("data", {}).get("type", "exact")
 
             if not list_type:
-                self._log.error(("Failed to get the type of url list from: {0}".format(str(request_response))))
+                self._log.error(f"Failed to get the type of url list from: {request_response!s}")
                 return action_result.set_status(phantom.APP_ERROR, "Failed to get the type of url list")
 
             data = {"name": self._list_name, "data": {"urls": content, "type": list_type}}
 
             # push the url list data to the Netskope server
             request_status, resp_json = self._make_rest_call(
-                endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
+                endpoint=(f"{url_list_endpoint}/replace"), action_result=action_result, data=data, method="patch"
             )
 
             if phantom.is_fail(request_status):
@@ -1469,18 +1461,18 @@ class NetskopeConnector(BaseConnector):
 
                     # push the url list data to the Netskope server
                     request_status, _ = self._make_rest_call(
-                        endpoint=("{0}/replace".format(url_list_endpoint)), action_result=action_result, data=data, method="patch"
+                        endpoint=(f"{url_list_endpoint}/replace"), action_result=action_result, data=data, method="patch"
                     )
 
                     if phantom.is_fail(request_status):
                         return action_result.get_status()
                 else:
-                    self._log.error("failed to update {0} url_list on the Netskope".format(self._list_name))
+                    self._log.error(f"failed to update {self._list_name} url_list on the Netskope")
                     return action_result.get_status()
 
-            self._log.info("successfully updated {0} url_list on the Netskope".format(self._list_name))
+            self._log.info(f"successfully updated {self._list_name} url_list on the Netskope")
             request_status, _ = self._make_rest_call(
-                endpoint="{0}/{1}".format(NETSKOPE_V2_URL_LIST_ENDPOINT, NETSKOPE_DEPLOY_URL_LIST),
+                endpoint=f"{NETSKOPE_V2_URL_LIST_ENDPOINT}/{NETSKOPE_DEPLOY_URL_LIST}",
                 action_result=action_result,
                 method="post",
             )
@@ -1510,8 +1502,8 @@ class NetskopeConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.error("exception_line={0} Update URL List: {1}".format(exc_tb.tb_lineno, error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Exception {0}: line={1}".format(error_message, exc_tb.tb_lineno))
+            self._log.error(f"exception_line={exc_tb.tb_lineno} Update URL List: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Exception {error_message}: line={exc_tb.tb_lineno}")
 
     def _handle_add_url_list(self, param):
         """Add URL to the URL list.
@@ -1533,31 +1525,31 @@ class NetskopeConnector(BaseConnector):
         """
         self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
-        self._log.info("param={0}".format(json.dumps(param)))
+        self._log.info(f"param={json.dumps(param)}")
         self.debug_print("Fetching url list")
         status, message, list_items = self.get_url_list()
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch url list. Error: {0}".format(message))
+            return action_result.set_status(phantom.APP_ERROR, f"Failed to fetch url list. Error: {message}")
 
         found_rows = [True for _, v in enumerate(list_items) if v == param[NETSKOPE_PARAM_URL]]
-        self._log.info("action=checking_for_matches status={0} message={1} matches={2}".format(status, message, found_rows))
+        self._log.info(f"action=checking_for_matches status={status} message={message} matches={found_rows}")
 
         if not found_rows:
-            return action_result.set_status(phantom.APP_SUCCESS, "{0} does not exist in list".format((param[NETSKOPE_PARAM_URL])))
+            return action_result.set_status(phantom.APP_SUCCESS, f"{param[NETSKOPE_PARAM_URL]} does not exist in list")
 
         status, remove_message = phantom_rules.delete_from_list(
             list_name=self._url_list, value=param[NETSKOPE_PARAM_URL], remove_all=True, remove_row=True
         )
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to delete url from the list. Error: {0}".format(remove_message))
+            return action_result.set_status(phantom.APP_ERROR, f"Failed to delete url from the list. Error: {remove_message}")
 
         if found_rows and len(list_items) == 1:
             status, _ = phantom_rules.set_list(list_name=self._url_list, values=[[]])
             remove_message = "Deleted Single Row"
 
-        self._log.info("action=delete_from_list status={0} message={1}".format(status, remove_message))
+        self._log.info(f"action=delete_from_list status={status} message={remove_message}")
         status, message, list_items = self.get_url_list()
         summary = action_result.update_summary({"remove_message": remove_message})
         summary["total_urls"] = len(list_items)
@@ -1596,14 +1588,14 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self._log.debug("parameters={0}".format(param))
+        self._log.debug(f"parameters={param}")
         self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             if NETSKOPE_PARAM_GROUP in param:
-                param["filter"] = 'displayName eq "{0}"'.format(param[NETSKOPE_PARAM_GROUP])
+                param["filter"] = f'displayName eq "{param[NETSKOPE_PARAM_GROUP]}"'
 
-            self._log.debug("action=make_scim_rest_call params={0}".format(param))
+            self._log.debug(f"action=make_scim_rest_call params={param}")
             request_status, request_response = self._make_scim_rest_call(
                 endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT, action_result=action_result, params=param
             )
@@ -1619,8 +1611,8 @@ class NetskopeConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.error("exception_line={0} Get SCIM Users: {1}".format(exc_tb.tb_lineno, error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Exception {0}: line={1}".format(error_message, exc_tb.tb_lineno))
+            self._log.error(f"exception_line={exc_tb.tb_lineno} Get SCIM Users: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Exception {error_message}: line={exc_tb.tb_lineno}")
 
     def _handle_get_scim_users(self, param):
         """Get SCIM users.
@@ -1628,14 +1620,14 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self._log.debug("parameters={0}".format(param))
+        self._log.debug(f"parameters={param}")
         self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             if NETSKOPE_PARAM_USER in param:
-                param["filter"] = ('userName eq "{0}"').format(param[NETSKOPE_PARAM_USER])
+                param["filter"] = f'userName eq "{param[NETSKOPE_PARAM_USER]}"'
 
-            self._log.debug("action=make_scim_rest_call params={0}".format(param))
+            self._log.debug(f"action=make_scim_rest_call params={param}")
             request_status, request_response = self._make_scim_rest_call(
                 endpoint=NETSKOPE_SCIM_USERS_ENDPOINT, action_result=action_result, params=param
             )
@@ -1651,8 +1643,8 @@ class NetskopeConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.error("exception_line={0} Get SCIM Users: {1}".format(exc_tb.tb_lineno, error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Exception {0}: line={1}".format(error_message, exc_tb.tb_lineno))
+            self._log.error(f"exception_line={exc_tb.tb_lineno} Get SCIM Users: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Exception {error_message}: line={exc_tb.tb_lineno}")
 
     def _handle_scim_user_to_group(self, param):
         """Add SCIM user to SCIM group.
@@ -1660,7 +1652,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self._log.info("parameters={0}".format(param))
+        self._log.info(f"parameters={param}")
         self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
@@ -1668,29 +1660,29 @@ class NetskopeConnector(BaseConnector):
                 "Operations": [{"op": param.get("action", "add"), "path": "members", "value": [{"value": param[NETSKOPE_PARAM_USER]}]}],
                 "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
             }
-            self._log.info("action=make_scim_rest_call params={0}".format(data))
+            self._log.info(f"action=make_scim_rest_call params={data}")
             request_status, request_response = self._make_scim_rest_call(
-                endpoint="{0}/{1}".format(NETSKOPE_SCIM_GROUPS_ENDPOINT, param[NETSKOPE_PARAM_GROUP]),
+                endpoint=f"{NETSKOPE_SCIM_GROUPS_ENDPOINT}/{param[NETSKOPE_PARAM_GROUP]}",
                 action_result=action_result,
                 params=data,
                 method="patch",
             )
 
             if phantom.is_fail(request_status):
-                self._log.error("action=failed status={0} response={1}".format(request_status, request_response))
+                self._log.error(f"action=failed status={request_status} response={request_response}")
                 return action_result.get_status()
 
             return action_result.set_status(
                 phantom.APP_SUCCESS,
-                "Successfully {0}ed user={1} in group={2}.".format(
+                "Successfully {}ed user={} in group={}.".format(
                     param.get("action", "add"), param[NETSKOPE_PARAM_USER], param[NETSKOPE_PARAM_GROUP]
                 ),
             )
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.error("exception_line={0} Add User to Group SCIM: {1}".format(exc_tb.tb_lineno, error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Exception {0}: line={1}".format(error_message, exc_tb.tb_lineno))
+            self._log.error(f"exception_line={exc_tb.tb_lineno} Add User to Group SCIM: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Exception {error_message}: line={exc_tb.tb_lineno}")
 
     def _handle_create_scim_group(self, param):
         """Create SCIM group.
@@ -1698,12 +1690,12 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self._log.info("parameters={0}".format(param))
+        self._log.info(f"parameters={param}")
         self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
             data = {"displayName": param[NETSKOPE_PARAM_GROUP], "schemas": ["urn:ietf:params:scim:schemas:core:2.0:Group"]}
-            self._log.info("action=make_scim_rest_call params={0}".format(data))
+            self._log.info(f"action=make_scim_rest_call params={data}")
             request_status, request_response = self._make_scim_rest_call(
                 endpoint=NETSKOPE_SCIM_GROUPS_ENDPOINT, action_result=action_result, params=data, method="post"
             )
@@ -1718,8 +1710,8 @@ class NetskopeConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.error(("exception_line={0} Add User to Group SCIM: {1}").format(exc_tb.tb_lineno, error_message))
-            return action_result.set_status(phantom.APP_ERROR, ("Exception {0}: line={1}").format(error_message, exc_tb.tb_lineno))
+            self._log.error(f"exception_line={exc_tb.tb_lineno} Add User to Group SCIM: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, (f"Exception {error_message}: line={exc_tb.tb_lineno}"))
 
     def _handle_create_scim_user(self, param):
         """Create SCIM user.
@@ -1727,7 +1719,7 @@ class NetskopeConnector(BaseConnector):
         :param param: Dictionary of input parameters
         :return: status success/failure
         """
-        self._log.info("parameters={0}".format(param))
+        self._log.info(f"parameters={param}")
         self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         try:
@@ -1738,7 +1730,7 @@ class NetskopeConnector(BaseConnector):
                 "emails": [{"value": param["email"], "primary": True}],
                 "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
             }
-            self._log.info("action=make_scim_rest_call params={0}".format(data))
+            self._log.info(f"action=make_scim_rest_call params={data}")
             request_status, request_response = self._make_scim_rest_call(
                 endpoint=NETSKOPE_SCIM_USERS_ENDPOINT, action_result=action_result, params=data, method="post"
             )
@@ -1753,8 +1745,8 @@ class NetskopeConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.error("exception_line={0} Add User to Group SCIM: {1}".format(exc_tb.tb_lineno, error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Exception {0}: line={1}".format(error_message, exc_tb.tb_lineno))
+            self._log.error(f"exception_line={exc_tb.tb_lineno} Add User to Group SCIM: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Exception {error_message}: line={exc_tb.tb_lineno}")
 
     def _handle_update_file_list(self, param):
         """Push file hash.
@@ -1781,7 +1773,7 @@ class NetskopeConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "No content found to update the file hash list")
 
             params = {"list": (",").join(content), "name": self._list_name}
-            self._log.info("action=get_file_list exists={0} message={1} content_length={2}".format(exists, message, len(content)))
+            self._log.info(f"action=get_file_list exists={exists} message={message} content_length={len(content)}")
             request_status, _ = self._make_rest_call(endpoint=NETSKOPE_FILE_LIST_ENDPOINT, action_result=action_result, params=params)
 
             if phantom.is_fail(request_status):
@@ -1794,8 +1786,8 @@ class NetskopeConnector(BaseConnector):
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             _, _, exc_tb = sys.exc_info()
-            self._log.error("exception_line={0} Update File Hash List: {1}".format(exc_tb.tb_lineno, error_message))
-            return action_result.set_status(phantom.APP_ERROR, "Exception {0}: line={1}".format(error_message, exc_tb.tb_lineno))
+            self._log.error(f"exception_line={exc_tb.tb_lineno} Update File Hash List: {error_message}")
+            return action_result.set_status(phantom.APP_ERROR, f"Exception {error_message}: line={exc_tb.tb_lineno}")
 
     def _add_list(self, action_result, list_type, new_list_name):
         base_url = self._get_phantom_base_url()
@@ -1821,7 +1813,7 @@ class NetskopeConnector(BaseConnector):
             r = requests.get(get_url, verify=False)
             response_json = r.json()
             if not response_json.get("content"):
-                return action_result.set_status(phantom.APP_ERROR, f'Failed to fetch {list_type}. Error: {response_json.get("message")}')
+                return action_result.set_status(phantom.APP_ERROR, f"Failed to fetch {list_type}. Error: {response_json.get('message')}")
 
             nested_list = response_json["content"]
             old_list = [item for sublist in nested_list for item in sublist]
@@ -1883,33 +1875,33 @@ class NetskopeConnector(BaseConnector):
         self.save_progress(NETSKOPE_ACTION_HANDLER_MESSAGE.format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        self._log.info("param={0}".format(json.dumps(param)))
+        self._log.info(f"param={json.dumps(param)}")
         self.debug_print("Fetching file list")
         status, message, list_items = self.get_file_list()
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to fetch file list. Error: {0}".format(message))
+            return action_result.set_status(phantom.APP_ERROR, f"Failed to fetch file list. Error: {message}")
 
         found_rows = [True for _, v in enumerate(list_items) if v == param[NETSKOPE_PARAM_HASH]]
-        self._log.info("action=checking_for_matches status={0} message={1} matches={2}".format(status, message, found_rows))
+        self._log.info(f"action=checking_for_matches status={status} message={message} matches={found_rows}")
 
         if not found_rows:
-            return action_result.set_status(phantom.APP_SUCCESS, "{0} does not exist in list".format(param[NETSKOPE_PARAM_HASH]))
+            return action_result.set_status(phantom.APP_SUCCESS, f"{param[NETSKOPE_PARAM_HASH]} does not exist in list")
 
         status, remove_message = phantom_rules.delete_from_list(
             list_name=self._file_list, value=param[NETSKOPE_PARAM_HASH], remove_all=True, remove_row=True
         )
 
         if not status:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to delete file hash from a list. Error: {0}".format(remove_message))
+            return action_result.set_status(phantom.APP_ERROR, f"Failed to delete file hash from a list. Error: {remove_message}")
 
         if found_rows and len(list_items) == 1:
             status, _ = phantom_rules.set_list(list_name=self._file_list, values=[[]])
             remove_message = "Deleted Single Row"
 
-        self._log.info("action=delete_from_list status={0} message={1}".format(status, remove_message))
+        self._log.info(f"action=delete_from_list status={status} message={remove_message}")
         status, message, list_items = self.get_file_list()
-        self._log.info("action=after_delete_from_list status={0} message={1} list_length={2}".format(status, message, len(list_items)))
+        self._log.info(f"action=after_delete_from_list status={status} message={message} list_length={len(list_items)}")
         summary = action_result.update_summary({"remove_message": remove_message})
         summary["total_files"] = len(list_items)
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -1921,7 +1913,7 @@ class NetskopeConnector(BaseConnector):
         :return: status success/failure
         """
         self.debug_print("action_id", self.get_action_identifier())
-        self._log.info("action_id={0}".format(self.get_action_identifier()))
+        self._log.info(f"action_id={self.get_action_identifier()}")
 
         action_mapping = {
             "test_connectivity": self._handle_test_connectivity,
@@ -1947,7 +1939,7 @@ class NetskopeConnector(BaseConnector):
 
         if action in list(action_mapping.keys()):
             action_function = action_mapping[action]
-            self._log.info("execute={0} params={1}".format(action, param))
+            self._log.info(f"execute={action} params={param}")
             action_execution_status = action_function(param)
 
         return action_execution_status
@@ -1956,7 +1948,7 @@ class NetskopeConnector(BaseConnector):
         """Get URL list."""
         status, message, pl = phantom_rules.get_list(self._url_list)
         pl2 = [x[0] for x in pl if len(x) > 0]
-        self._log.info("action=get_url_list status={0} message={1}".format(status, message))
+        self._log.info(f"action=get_url_list status={status} message={message}")
         return status, message, [x for x in pl2 if x is not None]
 
     def create_url_list(self):
@@ -1967,7 +1959,7 @@ class NetskopeConnector(BaseConnector):
         """Get file list."""
         status, message, pl = phantom_rules.get_list(self._file_list)
         pl2 = [x[0] for x in pl if len(x) > 0]
-        self._log.info("action=get_url_list status={0} message={1}".format(status, message))
+        self._log.info(f"action=get_url_list status={status} message={message}")
         return status, message, [x for x in pl2 if x is not None]
 
     def create_file_list(self):
@@ -1979,7 +1971,7 @@ class NetskopeConnector(BaseConnector):
         self._log.info("action=initialize status=start")
 
         self._state = self.load_state()
-        self._log.info("action=initialize state={0}".format(self._state))
+        self._log.info(f"action=initialize state={self._state}")
 
         if not isinstance(self._state, dict):
             self.debug_print("Resetting the state file with the default format")
@@ -1987,19 +1979,19 @@ class NetskopeConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, NETSKOPE_STATE_FILE_CORRUPT_ERROR)
 
         config = self.get_config()
-        self._file_list = "{0}_{1}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_FILE_LIST)
-        self._url_list = "{0}_{1}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_URL_LIST)
+        self._file_list = "{}_{}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_FILE_LIST)
+        self._url_list = "{}_{}".format(config.get(NETSKOPE_LIST_NAME, ""), NETSKOPE_URL_LIST)
         list_status, message, list_contents = self.get_url_list()
-        self._log.info("action=get_url_list status={0} message={1} contents_length={2}".format(list_status, message, len(list_contents)))
+        self._log.info(f"action=get_url_list status={list_status} message={message} contents_length={len(list_contents)}")
 
         if not list_status:
-            self._log.info("action=create_url_list return={0}".format(self.create_url_list()))
+            self._log.info(f"action=create_url_list return={self.create_url_list()}")
 
         list_status, message, list_contents = self.get_file_list()
-        self._log.info("action=get_file_list status={0} message={1} contents_length={2}".format(list_status, message, len(list_contents)))
+        self._log.info(f"action=get_file_list status={list_status} message={message} contents_length={len(list_contents)}")
 
         if not list_status:
-            self._log.info("action=create_file_list return={0}".format(self.create_file_list()))
+            self._log.info(f"action=create_file_list return={self.create_file_list()}")
 
         # Initialize list name
         self._list_name = config.get(NETSKOPE_LIST_NAME, "")
@@ -2060,13 +2052,13 @@ if __name__ == "__main__":
             data["password"] = password
             data["csrfmiddlewaretoken"] = csrftoken
             headers = dict()
-            headers["Cookie"] = ("csrftoken={0}").format(csrftoken)
+            headers["Cookie"] = f"csrftoken={csrftoken}"
             headers["Referer"] = login_url
             print("Logging into Platform to get the session id")
             response2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=NETSKOPE_DEFAULT_TIMEOUT)
             session_id = response2.cookies["sessionid"]
         except Exception as e:
-            print("Unable to get session id from the platform. Error: {0}".format(str(e)))
+            print(f"Unable to get session id from the platform. Error: {e!s}")
             sys.exit(1)
 
     with open(args.input_test_json) as (f):

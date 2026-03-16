@@ -2842,5 +2842,11 @@
             },
             "versions": "EQ(*)"
         }
-    ]
+    ],
+    "pip39_dependencies": {
+        "wheel": []
+    },
+    "pip313_dependencies": {
+        "wheel": []
+    }
 }

@@ -1,9 +1,9 @@
 # Netskope
 
-Publisher: Netskope \
-Connector Version: 4.0.1 \
-Product Vendor: Netskope \
-Product Name: Netskope \
+Publisher: Netskope <br>
+Connector Version: 4.0.1 <br>
+Product Vendor: Netskope <br>
+Product Name: Netskope <br>
 Minimum Product Version: 6.3.0
 
 This app integrates with the Netskope to execute various investigative and polling actions
@@ -111,28 +111,28 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration \
-[get file](#action-get-file) - Download a quarantined file and upload it to the vault \
-[get scim users](#action-get-scim-users) - Get current SCIM user(s). If no parameter is sent, it will retrieve all users \
-[get scim groups](#action-get-scim-groups) - Get current SCIM group(s). If no parameter is sent, it will retrieve all groups \
-[create scim group](#action-create-scim-group) - Create SCIM group \
-[create scim user](#action-create-scim-user) - Create SCIM user \
-[scim user group](#action-scim-user-group) - Add or Remove a user from a SCIM group \
-[list files](#action-list-files) - List all quarantined files \
-[run query](#action-run-query) - Run query for events on a given IP \
-[on poll](#action-on-poll) - Ingest data to Phantom \
-[add url](#action-add-url) - Add an URL to the Netskope URL Blocklist \
-[remove url](#action-remove-url) - Remove an URL from the Netskope URL Blocklist \
-[update url](#action-update-url) - Send the url list to Netskope \
-[add hash](#action-add-hash) - Add a file hash to the Netskope file hash list \
-[remove hash](#action-remove-hash) - Remove a hash from the Netskope file hash list \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration <br>
+[get file](#action-get-file) - Download a quarantined file and upload it to the vault <br>
+[get scim users](#action-get-scim-users) - Get current SCIM user(s). If no parameter is sent, it will retrieve all users <br>
+[get scim groups](#action-get-scim-groups) - Get current SCIM group(s). If no parameter is sent, it will retrieve all groups <br>
+[create scim group](#action-create-scim-group) - Create SCIM group <br>
+[create scim user](#action-create-scim-user) - Create SCIM user <br>
+[scim user group](#action-scim-user-group) - Add or Remove a user from a SCIM group <br>
+[list files](#action-list-files) - List all quarantined files <br>
+[run query](#action-run-query) - Run query for events on a given IP <br>
+[on poll](#action-on-poll) - Ingest data to Phantom <br>
+[add url](#action-add-url) - Add an URL to the Netskope URL Blocklist <br>
+[remove url](#action-remove-url) - Remove an URL from the Netskope URL Blocklist <br>
+[update url](#action-update-url) - Send the url list to Netskope <br>
+[add hash](#action-add-hash) - Add a file hash to the Netskope file hash list <br>
+[remove hash](#action-remove-hash) - Remove a hash from the Netskope file hash list <br>
 [update hash](#action-update-hash) - Send the file hash list to Netskope
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity using supplied configuration
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -147,7 +147,7 @@ No Output
 
 Download a quarantined file and upload it to the vault
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -175,7 +175,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get current SCIM user(s). If no parameter is sent, it will retrieve all users
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -208,7 +208,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get current SCIM group(s). If no parameter is sent, it will retrieve all groups
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -236,7 +236,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create SCIM group
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -262,7 +262,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create SCIM user
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -301,7 +301,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add or Remove a user from a SCIM group
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -328,7 +328,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List all quarantined files
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -356,7 +356,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Run query for events on a given IP
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <ul><li>If no &quotstart_time&quot and &quotend_time&quot is provided, the action will take the last 24 hours as the time period.<li>If only &quotstart_time&quot is provided, current time would be taken as &quotend_time&quot.<li>If only &quotend_time&quot is provided, 24 hours prior to &quotend_time&quot would be taken as &quotstart_time&quot.<li>The action only returns page and application events for the given IP.</ul>
@@ -572,7 +572,7 @@ summary.total_objects_successful | numeric | | 2 |
 
 Ingest data to Phantom
 
-Type: **ingest** \
+Type: **ingest** <br>
 Read only: **True**
 
 For <b>manual run</b> and <b>first poll</b>, alerts of the last 24 hours would be ingested. Subsequent polls will ingest new alerts.<br>Only alerts of type &quotMalware&quot will be ingested.
@@ -595,7 +595,7 @@ No Output
 
 Add an URL to the Netskope URL Blocklist
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 This action will add URL value to the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update url</b> action is performed.
@@ -624,7 +624,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Remove an URL from the Netskope URL Blocklist
 
-Type: **correct** \
+Type: **correct** <br>
 Read only: **False**
 
 This action will remove URL value from the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update url</b> action is performed.
@@ -653,7 +653,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Send the url list to Netskope
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 This action replaces the URL list of a Netskope server with the configured Splunk SOAR custom URL list.
@@ -678,7 +678,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add a file hash to the Netskope file hash list
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 This action will add file hash value to the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update hash</b> action is performed.
@@ -707,7 +707,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Remove a hash from the Netskope file hash list
 
-Type: **correct** \
+Type: **correct** <br>
 Read only: **False**
 
 This action will remove file hash value from the configured Splunk SOAR custom list only and that will be reflected in the Netskope after <b>update hash</b> action is performed.
@@ -735,7 +735,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Send the file hash list to Netskope
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 This action replaces the hash list of a Netskope server with the configured Splunk SOAR custom hash list.
@@ -760,7 +760,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

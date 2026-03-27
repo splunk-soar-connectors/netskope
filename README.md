@@ -1,7 +1,7 @@
 # Netskope
 
 Publisher: Netskope <br>
-Connector Version: 4.0.1 <br>
+Connector Version: 4.1.0 <br>
 Product Vendor: Netskope <br>
 Product Name: Netskope <br>
 Minimum Product Version: 6.3.0

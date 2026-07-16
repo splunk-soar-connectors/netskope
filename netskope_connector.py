@@ -15,6 +15,7 @@
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 import uuid
@@ -70,7 +71,6 @@ class NetskopeConnector(BaseConnector):
         """
         error_code = NETSKOPE_ERROR_CODE_MESSAGE
         error_message = NETSKOPE_ERROR_MESSAGE
-        self._dump_error_log(e)
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
@@ -81,7 +81,8 @@ class NetskopeConnector(BaseConnector):
         except Exception as ex:
             self._dump_error_log(ex, "Error occurred while retrieving exception information")
 
-        return f"Error Code: {error_code}. Error Message: {error_message}"
+        message = f"Error Code: {error_code}. Error Message: {error_message}"
+        return re.sub(r"(?i)(token=)[^&\s'\"),]+", r"\1[REDACTED]", message)
 
     @staticmethod
     def _process_empty_response(response, action_result):
@@ -260,7 +261,7 @@ class NetskopeConnector(BaseConnector):
 
                 self._log.error(f"action=failed exception={error_message}")
                 message = f"Error connecting to server. Details: {error_message}"
-                if "token=" in e:
+                if "token=" in str(e).casefold():
                     message = "Error while connecting to the server"
 
                 self._log.info(f"action=failed response={resp_json}")
@@ -374,7 +375,7 @@ class NetskopeConnector(BaseConnector):
                 os.remove(temp_file_path)
 
             message = f"Error connecting to server. Details: {error_message}"
-            if "token=" in e:
+            if "token=" in str(e).casefold():
                 message = "Error while connecting to the server"
 
             return RetVal(action_result.set_status(phantom.APP_ERROR, message), resp_json)

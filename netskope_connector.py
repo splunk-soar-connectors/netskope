@@ -20,7 +20,7 @@ import sys
 import time
 import uuid
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 import phantom.app as phantom
 import phantom.rules as phantom_rules
@@ -1662,8 +1662,9 @@ class NetskopeConnector(BaseConnector):
                 "schemas": ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
             }
             self._log.info(f"action=make_scim_rest_call params={data}")
+            group_id = quote(str(param[NETSKOPE_PARAM_GROUP]), safe="")
             request_status, request_response = self._make_scim_rest_call(
-                endpoint=f"{NETSKOPE_SCIM_GROUPS_ENDPOINT}/{param[NETSKOPE_PARAM_GROUP]}",
+                endpoint=f"{NETSKOPE_SCIM_GROUPS_ENDPOINT}/{group_id}",
                 action_result=action_result,
                 params=data,
                 method="patch",

@@ -1,3 +1,3 @@
 **Unreleased**
 
-* Chore: prepare the ESPM-5228 vulnerability remediation series.
+* Security: Escape query widget values before embedding them in JavaScript handlers.

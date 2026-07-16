@@ -718,6 +718,10 @@
                     "data_type": "string",
                     "required": true,
                     "default": "add",
+                    "value_list": [
+                        "add",
+                        "remove"
+                    ],
                     "order": 2
                 }
             },

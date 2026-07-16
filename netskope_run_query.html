@@ -89,7 +89,7 @@
               <td>IP</td>
               <td>
                 <a href="javascript:;"
-                   onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ result.param.ip }}' }], 0, {{ container.id }}, null, false);">
+                   onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ result.param.ip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                   {{ result.param.ip }}
                   &nbsp;
                   <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -127,7 +127,7 @@
                 <tr>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ pages.srcip }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ pages.srcip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ pages.srcip }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -135,7 +135,7 @@
                   </td>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ pages.dstip }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ pages.dstip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ pages.dstip }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -144,7 +144,7 @@
                   <td class="widget-td">{{ pages.site }}</td>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ pages.user }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ pages.user|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ pages.user }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -152,7 +152,7 @@
                   </td>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['domain'], 'value':'{{ pages.org }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value':'{{ pages.org|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ pages.org }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -181,7 +181,7 @@
                 <tr>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ app.srcip }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ app.srcip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ app.srcip }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -189,7 +189,7 @@
                   </td>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ app.dstip }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['ip'], 'value':'{{ app.dstip|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ app.dstip }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -198,7 +198,7 @@
                   <td class="widget-td">{{ app.site }}</td>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ app.user }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ app.user|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ app.user }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -206,7 +206,7 @@
                   </td>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ app.from_user }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['email'], 'value':'{{ app.from_user|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ app.from_user }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
@@ -214,7 +214,7 @@
                   </td>
                   <td class="widget-td">
                     <a href="javascript:;"
-                       onclick="context_menu(this, [{'contains': ['domain'], 'value':'{{ app.org }}' }], 0, {{ container.id }}, null, false);">
+                       onclick="context_menu(this, [{'contains': ['domain'], 'value':'{{ app.org|escapejs }}' }], 0, {{ container.id }}, null, false);">
                       {{ app.org }}
                       &nbsp;
                       <span class="fa fa-caret-down" style="font-size: smaller;"></span>
